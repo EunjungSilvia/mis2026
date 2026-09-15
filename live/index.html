@@ -15,14 +15,14 @@ main{padding:22px 0 calc(var(--composer-h) + 28px)}.back{display:inline-block;ma
 </head>
 <body>
 <header><div class="wrap"><div class="eyebrow">MANAGEMENT INFORMATION SYSTEMS · LIVE CLASS</div><h1>Live Class</h1><div class="sub">교수자가 연 질문에 익명으로 짧게 참여합니다.</div></div></header>
-<main class="wrap"><a class="back" href="../">← MIS Course Materials</a><section class="card"><div class="top"><div class="toprow"><div><div class="kicker">WEEK 02</div><h2 id="sessionTitle">오늘의 질문</h2></div><span id="liveBadge" class="badge">STANDBY</span></div><div id="liveQuestion" class="question">현재 열려 있는 질문이 없습니다. 수업 중 질문이 열리면 자동으로 표시됩니다.</div><div id="liveInstruction" class="instruction"></div></div><div id="liveResponses" class="chat"><div class="empty">Live Class가 시작되면 응답이 여기에 표시됩니다.</div></div></section></main>
+<main class="wrap"><a class="back" href="../">← MIS Course Materials</a><section class="card"><div class="top"><div class="toprow"><div><div class="kicker">WEEK 03</div><h2 id="sessionTitle">오늘의 질문</h2></div><span id="liveBadge" class="badge">STANDBY</span></div><div id="liveQuestion" class="question">현재 열려 있는 질문이 없습니다. 수업 중 질문이 열리면 자동으로 표시됩니다.</div><div id="liveInstruction" class="instruction"></div></div><div id="liveResponses" class="chat"><div class="empty">Live Class가 시작되면 응답이 여기에 표시됩니다.</div></div></section></main>
 <div class="composer"><div class="composer-inner"><div class="form"><input id="liveInput" maxlength="200" placeholder="질문이 열리면 입력할 수 있습니다." disabled><button id="liveSend" class="send" type="button" disabled>보내기</button></div><div class="meta"><span id="liveStatus">교수자가 Live Class를 열기를 기다리고 있습니다.</span><span><span id="liveCount">0</span> / 200</span></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL='https://bwmbjfrrbeepfdfboqbg.supabase.co';
 const SUPABASE_KEY='sb_publishable_Ag59Uqz-yvH4AqznKHMg1g__p3sEvL0';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const WEEK_ID='week02';
+const WEEK_ID='week03';
 let currentSession=null,channel=null,checking=false;
 const q=document.getElementById('liveQuestion'),instruction=document.getElementById('liveInstruction'),input=document.getElementById('liveInput'),send=document.getElementById('liveSend'),badge=document.getElementById('liveBadge'),responses=document.getElementById('liveResponses'),count=document.getElementById('liveCount'),status=document.getElementById('liveStatus'),title=document.getElementById('sessionTitle'),composer=document.querySelector('.composer');
 function syncComposerHeight(){document.documentElement.style.setProperty('--composer-h',composer.offsetHeight+'px');}
