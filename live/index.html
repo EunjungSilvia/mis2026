@@ -23,7 +23,7 @@ const SUPABASE_URL='https://bwmbjfrrbeepfdfboqbg.supabase.co';
 const SUPABASE_KEY='sb_publishable_Ag59Uqz-yvH4AqznKHMg1g__p3sEvL0';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const WEEK_ID='week03';
-const NICK_KEY='mis2026_live_nickname';let nickname=(localStorage.getItem(NICK_KEY)||'').trim();let currentSession=null,channel=null,checking=false;
+const NICK_KEY='mis2026_site_nickname',OLD_NICK_KEY='mis2026_live_nickname';if(!localStorage.getItem(NICK_KEY)&&localStorage.getItem(OLD_NICK_KEY))localStorage.setItem(NICK_KEY,localStorage.getItem(OLD_NICK_KEY));let nickname=(localStorage.getItem(NICK_KEY)||'').trim();let currentSession=null,channel=null,checking=false;
 const q=document.getElementById('liveQuestion'),instruction=document.getElementById('liveInstruction'),input=document.getElementById('liveInput'),send=document.getElementById('liveSend'),badge=document.getElementById('liveBadge'),responses=document.getElementById('liveResponses'),count=document.getElementById('liveCount'),status=document.getElementById('liveStatus'),title=document.getElementById('sessionTitle'),composer=document.querySelector('.composer'),nicknameLabel=document.getElementById('nicknameLabel'),changeNickname=document.getElementById('changeNickname');
 function syncComposerHeight(){document.documentElement.style.setProperty('--composer-h',composer.offsetHeight+'px');}
 if('ResizeObserver'in window){new ResizeObserver(syncComposerHeight).observe(composer);}window.addEventListener('resize',syncComposerHeight);syncComposerHeight();
