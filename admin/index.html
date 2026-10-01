@@ -23,7 +23,7 @@ main{padding:24px 0 60px}.back{color:var(--green);font-weight:780;text-decoratio
 <section id="adminCard" class="hidden">
 <div class="card"><div class="row" style="justify-content:space-between"><div><strong id="userLabel"></strong><div class="note">본명·학번은 이 교수자 화면에서만 표시됩니다.</div></div><button id="logoutBtn" class="btn secondary">로그아웃</button></div>
 <div class="row" style="margin-top:14px"><select id="sectionFilter"><option value="">전체 분반</option><option value="A">A분반</option><option value="B">B분반</option><option value="C">C분반</option></select><input id="searchBox" placeholder="본명·학번·닉네임 검색" style="min-width:240px"><button id="refreshBtn" class="btn secondary">새로고침</button></div>
-<div class="summary"><div class="stat"><div id="studentCount" class="n">0</div><div class="l">표시 학생</div></div><div class="stat"><div id="linkedCount" class="n">0</div><div class="l">닉네임 연결</div></div><div class="stat"><div id="commentCount" class="n">0</div><div class="l">주차 댓글</div></div><div class="stat"><div id="liveCount" class="n">0</div><div class="l">LiveClass 응답</div></div></div>
+<div class="summary"><div class="stat"><div id="studentCount" class="n">0</div><div class="l">참여 닉네임</div></div><div class="stat"><div id="linkedCount" class="n">0</div><div class="l">본명 인증</div></div><div class="stat"><div id="commentCount" class="n">0</div><div class="l">주차 댓글</div></div><div class="stat"><div id="liveCount" class="n">0</div><div class="l">LiveClass 응답</div></div></div>
 <div id="status" class="note" style="margin-top:12px">데이터를 불러오는 중입니다.</div>
 <div class="tablewrap"><table><thead><tr><th class="name">학생</th><th>닉네임</th><th>분반</th><th>W1</th><th>W2</th><th>W3</th><th>W4</th><th>W5</th><th>W6</th><th>W7</th><th>Live</th><th>총 참여</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
 <div id="detailCard" class="card detail hidden"></div>
@@ -54,19 +54,17 @@ async function loadAll(){status.textContent='참여 데이터를 불러오는 �
  roster=r1.error?[]:(r1.data||[]);registry=r2.error?[]:(r2.data||[]);comments=r3.error?[]:(r3.data||[]);liveResponses=r4.error?[]:(r4.data||[]);sessions=r5.error?[]:(r5.data||[]);buildModel();renderTable();const blocked=[];if(r1.error)blocked.push('학생 명단');if(r2.error)blocked.push('닉네임-본명 연결');status.textContent=blocked.length?'참여 기록은 불러왔습니다. 현재 '+blocked.join(', ')+' 정보만 권한 문제로 제한되어 있습니다.':'학생 행을 클릭하면 댓글과 LiveClass 응답 내용을 확인할 수 있습니다.';
 }
 function buildModel(){
- const regByStudent=new Map(registry.filter(x=>x.student_id!=null).map(x=>[String(x.student_id),x]));
  const regByNick=new Map(registry.map(x=>[norm(x.nickname),x]));
  const rosterById=new Map(roster.map(x=>[String(x.id),x]));
  const commentsByNick=new Map(),liveByNick=new Map();
  comments.forEach(c=>{const k=norm(c.nickname);if(!k)return;if(!commentsByNick.has(k))commentsByNick.set(k,[]);commentsByNick.get(k).push(c);});
  liveResponses.forEach(c=>{const k=norm(c.nickname);if(!k)return;if(!liveByNick.has(k))liveByNick.set(k,[]);liveByNick.get(k).push(c);});
- model=[];const seen=new Set();
- roster.forEach(s=>{const reg=regByStudent.get(String(s.id));const nick=reg?.nickname||'';const k=norm(nick);const cs=k?(commentsByNick.get(k)||[]):[];const ls=k?(liveByNick.get(k)||[]):[];const wc={};cs.forEach(c=>{const n=weekNo(c.week_id);if(n)wc[n]=(wc[n]||0)+1;});model.push({...s,nickname:nick,comments:cs,live:ls,wc,total:cs.length+ls.length});if(k)seen.add(k);});
- const allNicks=new Set([...commentsByNick.keys(),...liveByNick.keys(),...regByNick.keys()]);
- allNicks.forEach(k=>{if(!k||seen.has(k))return;const reg=regByNick.get(k);const s=reg?.student_id?rosterById.get(String(reg.student_id)):null;const cs=commentsByNick.get(k)||[],ls=liveByNick.get(k)||[];const wc={};cs.forEach(c=>{const n=weekNo(c.week_id);if(n)wc[n]=(wc[n]||0)+1;});model.push({id:'nick:'+k,student_number:s?.student_number||'',full_name:s?.full_name||'',major:s?.major||'',grade:s?.grade||'',section_code:s?.section_code||'',nickname:reg?.nickname||cs[0]?.nickname||ls[0]?.nickname||k,comments:cs,live:ls,wc,total:cs.length+ls.length});});
+ model=[];
+ const participantNicks=new Set([...commentsByNick.keys(),...liveByNick.keys()]);
+ participantNicks.forEach(k=>{if(!k)return;const reg=regByNick.get(k);const student=reg?.student_id!=null?rosterById.get(String(reg.student_id)):null;const cs=commentsByNick.get(k)||[],ls=liveByNick.get(k)||[];const wc={};cs.forEach(c=>{const n=weekNo(c.week_id);if(n)wc[n]=(wc[n]||0)+1;});model.push({id:'nick:'+k,student_number:student?.student_number||'',full_name:student?.full_name||'',major:student?.major||'',grade:student?.grade||'',section_code:student?.section_code||'',nickname:reg?.nickname||cs[0]?.nickname||ls[0]?.nickname||k,comments:cs,live:ls,wc,total:cs.length+ls.length});});
 }
 function filtered(){const sec=sectionFilter.value,q=norm(searchBox.value);return model.filter(s=>(!sec||String(s.section_code||'').toUpperCase()===sec)&&(!q||[s.full_name,s.student_number,s.nickname,s.major].some(v=>norm(v).includes(q))));}
-function renderTable(){const data=filtered();document.getElementById('studentCount').textContent=data.length;document.getElementById('linkedCount').textContent=data.filter(x=>x.nickname).length;document.getElementById('commentCount').textContent=data.reduce((a,x)=>a+x.comments.length,0);document.getElementById('liveCount').textContent=data.reduce((a,x)=>a+x.live.length,0);
+function renderTable(){const data=filtered();document.getElementById('studentCount').textContent=data.length;document.getElementById('linkedCount').textContent=data.filter(x=>x.full_name).length;document.getElementById('commentCount').textContent=data.reduce((a,x)=>a+x.comments.length,0);document.getElementById('liveCount').textContent=data.reduce((a,x)=>a+x.live.length,0);
  tbody.innerHTML=data.map(s=>'<tr class="clickable" data-id="'+s.id+'"><td class="name"><strong>'+esc(s.full_name||'본명 미연결')+'</strong><br><span class="note">'+esc(s.student_number||'')+'</span></td><td>'+(s.nickname?'<span class="nick">'+esc(s.nickname)+'</span>':'<span class="zero">미연결</span>')+'</td><td>'+esc((s.section_code||'-').toUpperCase())+'</td>'+[1,2,3,4,5,6,7].map(w=>'<td>'+(s.wc[w]?'<span class="dot">'+s.wc[w]+'</span>':'<span class="zero">–</span>')+'</td>').join('')+'<td>'+(s.live.length?'<span class="dot">'+s.live.length+'</span>':'<span class="zero">–</span>')+'</td><td><strong>'+s.total+'</strong></td></tr>').join('');
  tbody.querySelectorAll('tr[data-id]').forEach(tr=>tr.onclick=()=>showDetail(tr.dataset.id));
 }
