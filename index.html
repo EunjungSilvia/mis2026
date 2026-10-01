@@ -1,27 +1,43 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MIS 2026 · Course Materials</title><style>body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR",sans-serif;background:#f3f0ea;color:#18211d}.wrap{max-width:1080px;margin:0 auto;padding:0 24px}header{background:linear-gradient(135deg,#17211d,#294238);color:white;padding:64px 0;border-top:6px solid #b44d35}.eyebrow{font-size:.8rem;letter-spacing:.16em;color:#e1aa93;font-weight:700}h1{font-size:clamp(2.3rem,5vw,4rem);margin:10px 0 12px;line-height:1.08}.sub{color:#d9e0dc;font-size:1.08rem}main{padding:42px 0 72px}.intro{background:#fffdf9;border:1px solid #d9d2c7;border-radius:18px;padding:26px 28px;margin-bottom:26px}.live-shortcut{display:flex;align-items:center;justify-content:space-between;gap:22px;background:#244f43;color:white;border-radius:18px;padding:22px 26px;margin-bottom:26px;text-decoration:none;box-shadow:0 8px 24px rgba(29,36,32,.10)}.live-shortcut:hover{transform:translateY(-1px)}.shortcut-label{font-size:.76rem;letter-spacing:.12em;color:#e1aa93;font-weight:800}.shortcut-title{font-size:1.45rem;font-weight:800;margin:5px 0}.shortcut-desc{color:#d9e0dc;font-size:.94rem}.shortcut-action{white-space:nowrap;background:white;color:#244f43;padding:11px 15px;border-radius:10px;font-weight:800}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.week{background:#fffdf9;border:1px solid #d9d2c7;border-radius:18px;padding:22px;text-decoration:none;color:inherit;box-shadow:0 8px 24px rgba(29,36,32,.05)}.week.active{border-top:5px solid #244f43}.week.preview{border-top:5px solid #b38b2e}.week.soon{opacity:.58}.num{font-size:.78rem;letter-spacing:.12em;color:#b44d35;font-weight:800}.week h2{margin:9px 0 8px;font-size:1.25rem}.week p{margin:0;color:#676d69}.status{display:inline-block;margin-top:18px;font-size:.8rem;font-weight:750;padding:5px 9px;border-radius:999px;background:#e6eee9;color:#244f43}.preview .status{background:#eee7d4;color:#7b6529}.soon .status{background:#eeeae3;color:#777}@media(max-width:760px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.grid{grid-template-columns:1fr}.wrap{padding:0 16px}.live-shortcut{align-items:flex-start;padding:20px;flex-direction:column;gap:14px}.shortcut-action{width:100%;box-sizing:border-box;text-align:center}}</style></head><body><header><div class="wrap"><div class="eyebrow">MANAGEMENT INFORMATION SYSTEMS · 2026</div><h1>MIS Course Materials</h1><div class="sub">주차별 Learning Guide, Case Reading 및 수업자료를 확인합니다.</div></div></header><main class="wrap"><a class="live-shortcut" href="live/"><div><div class="shortcut-label">LIVE CLASS</div><div class="shortcut-title">수업 참여하기</div><div class="shortcut-desc">수업 중 열린 질문에 한 문장을 남겨보세요.</div></div><div class="shortcut-action">LIVE CLASS 참여하기 →</div></a><section class="intro"><strong>수업자료 안내</strong><br>각 주차 카드를 선택하면 해당 주차의 학생용 자료를 열거나 다운로드할 수 있습니다.</section><section class="grid"><a class="week active" href="mis-week01/"><div class="num">WEEK 01</div><h2>Understanding MIS in the AI Era</h2><p>정보시스템을 보는 첫 번째 관점</p><span class="status">자료 열기</span></a><a class="week preview" href="mis-week02/"><div class="num">WEEK 02</div><h2>Business Strategy & Information Systems</h2><p>비즈니스 전략과 정보시스템</p><span class="status">자료 열기</span></a><a class="week active" href="mis-week03/"><div class="num">WEEK 03</div><h2>Decision Making &amp; Business Process</h2><p>의사결정과 비즈니스 프로세스</p><span class="status">자료 열기</span></a><a class="week active" href="mis-week04/"><div class="num">WEEK 04</div><h2>Digital Business &amp; Business Model</h2><p>디지털 비즈니스와 비즈니스모델</p><span class="status">자료 열기</span></a><div class="week soon"><div class="num">WEEK 05</div><h2>Coming Soon</h2><p>Week 5 자료는 수업에 맞춰 공개됩니다.</p><span class="status">준비 중</span></div><div class="week soon"><div class="num">WEEK 06</div><h2>Coming Soon</h2><p>Week 6 자료는 수업에 맞춰 공개됩니다.</p><span class="status">준비 중</span></div></section></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
 const SUPABASE_URL='https://bwmbjfrrbeepfdfboqbg.supabase.co';
 const SUPABASE_KEY='sb_publishable_Ag59Uqz-yvH4AqznKHMg1g__p3sEvL0';
-const NICK_KEY='mis2026_site_nickname',OLD_NICK_KEY='mis2026_live_nickname',PIN_OK_KEY='mis2026_nickname_verified';
-if(!localStorage.getItem(NICK_KEY)&&localStorage.getItem(OLD_NICK_KEY))localStorage.setItem(NICK_KEY,localStorage.getItem(OLD_NICK_KEY));
+const NICK_KEY='mis2026_site_nickname',PIN_OK_KEY='mis2026_nickname_verified',IDENTITY_OK_KEY='mis2026_student_identity_verified';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-async function rpcNick(fn,nick,pin){const{data,error}=await db.rpc(fn,{p_nickname:nick,p_pin:pin});if(error)return{ok:false,code:'error'};return data||{ok:false,code:'error'};}
-async function nickStatus(nick){const{data,error}=await db.rpc('site_nickname_status',{p_nickname:nick});if(error)return{ok:false,status:'error'};return data||{ok:false,status:'error'};}
 function askPin(message){const raw=prompt(message);if(raw===null)return{cancelled:true};const pin=raw.trim();if(!/^[0-9]{4}$/.test(pin)){alert('PIN은 숫자 4자리로 입력해 주세요.');return{invalid:true};}return{pin};}
-async function ensureNickname(){
- let saved=(localStorage.getItem(NICK_KEY)||'').trim();
- if(saved&&localStorage.getItem(PIN_OK_KEY)==='1')return saved;
+async function nickStatus(nick){const{data,error}=await db.rpc('site_nickname_status',{p_nickname:nick});return error?{ok:false}:data;}
+async function verifyNick(nick,pin){const{data,error}=await db.rpc('verify_site_nickname',{p_nickname:nick,p_pin:pin});return error?{ok:false,code:'error'}:data;}
+async function studentStatus(name,no){const{data,error}=await db.rpc('student_identity_status',{p_full_name:name,p_student_number:no});return error?{ok:false,code:'error'}:data;}
+function saveVerified(nick){localStorage.setItem(NICK_KEY,nick);localStorage.setItem(PIN_OK_KEY,'1');localStorage.setItem(IDENTITY_OK_KEY,'1');return nick;}
+async function ensureStudent(){
+ const saved=(localStorage.getItem(NICK_KEY)||'').trim();
+ if(saved&&localStorage.getItem(PIN_OK_KEY)==='1'&&localStorage.getItem(IDENTITY_OK_KEY)==='1')return saved;
  while(true){
-  const raw=prompt('MIS 사이트에서 사용할 닉네임을 입력해 주세요.',saved);
-  if(raw===null)return '';
-  const nick=raw.trim().slice(0,30); if(!nick){alert('닉네임을 입력해 주세요.');continue;}
-  const st=await nickStatus(nick); if(!st.ok){alert('닉네임 상태를 확인하지 못했습니다. 다시 시도해 주세요.');continue;}
-  if(st.status==='registered'){const pr=askPin('등록한 4자리 PIN을 입력해 주세요.');if(pr.cancelled)return '';if(pr.invalid)continue;const v=await rpcNick('verify_site_nickname',nick,pr.pin);if(v.ok){localStorage.setItem(NICK_KEY,v.nickname);localStorage.setItem(PIN_OK_KEY,'1');return v.nickname;}alert(v.code==='wrong_pin'?'PIN이 일치하지 않습니다. 다시 입력해 주세요.':'닉네임을 확인하지 못했습니다. 다시 시도해 주세요.');continue;}
-  if(st.status==='legacy'){const pr=askPin('기존에 사용하던 닉네임입니다. 앞으로 사용할 4자리 PIN을 새로 설정해 주세요.');if(pr.cancelled)return '';if(pr.invalid)continue;const v=await rpcNick('claim_legacy_site_nickname',nick,pr.pin);if(v.ok){localStorage.setItem(NICK_KEY,v.nickname);localStorage.setItem(PIN_OK_KEY,'1');return v.nickname;}alert('PIN을 등록하지 못했습니다. 다시 시도해 주세요.');continue;}
-  if(st.status==='new'){const pr=askPin('새 닉네임입니다. 이 닉네임에 사용할 4자리 PIN을 설정해 주세요.');if(pr.cancelled)return '';if(pr.invalid)continue;const v=await rpcNick('claim_site_nickname',nick,pr.pin);if(v.ok){localStorage.setItem(NICK_KEY,v.nickname);localStorage.setItem(PIN_OK_KEY,'1');return v.nickname;}alert(v.code==='taken'?'이미 사용 중인 닉네임입니다.':'닉네임을 등록하지 못했습니다. 다시 시도해 주세요.');}
+  const nr=prompt('학생 본인 확인을 위해 이름을 입력해 주세요.'); if(nr===null)return '';
+  const name=nr.trim(); if(!name){alert('이름을 입력해 주세요.');continue;}
+  const sr=prompt('학번을 입력해 주세요.'); if(sr===null)return '';
+  const no=sr.trim(); if(!no){alert('학번을 입력해 주세요.');continue;}
+  const st=await studentStatus(name,no);
+  if(!st.ok){alert(st.code==='no_match'?'이름과 학번이 학생 명단과 일치하지 않습니다. 다시 확인해 주세요.':'학생 정보를 확인하지 못했습니다. 다시 시도해 주세요.');continue;}
+  if(st.has_nickname){
+   const pr=askPin('등록된 닉네임은 “'+st.nickname+'”입니다.\n4자리 PIN을 입력해 주세요.'); if(pr.cancelled)return ''; if(pr.invalid)continue;
+   const v=await verifyNick(st.nickname,pr.pin);
+   if(v.ok)return saveVerified(v.nickname);
+   alert(v.code==='wrong_pin'?'PIN이 일치하지 않습니다. 다시 입력해 주세요.':'닉네임을 확인하지 못했습니다.');continue;
+  }
+  const rr=prompt('사용할 닉네임을 입력해 주세요.\n기존에 사용하던 닉네임이 있다면 같은 닉네임을 입력하세요.');
+  if(rr===null)return ''; const nick=rr.trim().slice(0,30); if(!nick){alert('닉네임을 입력해 주세요.');continue;}
+  const ns=await nickStatus(nick); if(!ns||!ns.ok){alert('닉네임 상태를 확인하지 못했습니다.');continue;}
+  const pr=askPin(ns.status==='registered'?'기존 닉네임의 4자리 PIN을 입력해 주세요.':ns.status==='legacy'?'기존 닉네임입니다. 앞으로 사용할 4자리 PIN을 설정해 주세요.':'새 닉네임입니다. 사용할 4자리 PIN을 설정해 주세요.');
+  if(pr.cancelled)return ''; if(pr.invalid)continue;
+  let fn=ns.status==='registered'?'link_student_nickname':ns.status==='legacy'?'claim_student_legacy_nickname':'claim_student_nickname';
+  const{data,error}=await db.rpc(fn,{p_full_name:name,p_student_number:no,p_nickname:nick,p_pin:pr.pin});
+  if(!error&&data&&data.ok)return saveVerified(data.nickname);
+  const code=data&&data.code;
+  if(code==='wrong_pin')alert('PIN이 일치하지 않습니다. 다시 입력해 주세요.');
+  else if(code==='taken'||code==='nickname_linked')alert('이미 다른 학생에게 연결된 닉네임입니다.');
+  else alert('닉네임을 연결하지 못했습니다. 다시 시도해 주세요.');
  }
 }
-document.querySelectorAll('a.week[href]').forEach(card=>card.addEventListener('click',async e=>{
- e.preventDefault(); const href=card.getAttribute('href'); const nick=await ensureNickname(); if(!nick)return;
- if(confirm('현재 닉네임은 “'+nick+'”입니다.\n이 닉네임으로 Week 자료를 열까요?')) location.href=href;
-}));
+document.querySelectorAll('a.week[href]').forEach(card=>card.addEventListener('click',async e=>{e.preventDefault();const href=card.getAttribute('href');const nick=await ensureStudent();if(!nick)return;if(confirm('본인 확인이 완료되었습니다.\n현재 닉네임은 “'+nick+'”입니다.\n이 닉네임으로 Week 자료를 열까요?'))location.href=href;}));
+document.querySelector('a.live-shortcut').addEventListener('click',async e=>{e.preventDefault();const nick=await ensureStudent();if(nick)location.href='live/';});
 </script></body></html>
