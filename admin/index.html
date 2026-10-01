@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MIS 2026 · Participation Admin</title>
+<style>
+:root{--bg:#f3f0ea;--paper:#fffdf9;--ink:#18211d;--muted:#69716c;--line:#d9d2c7;--green:#244f43;--accent:#b44d35;--soft:#f5f2ed}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR",sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:1180px;margin:auto;padding:0 20px}header{background:linear-gradient(135deg,#17211d,#294238);color:#fff;border-top:6px solid var(--accent);padding:34px 0}
+.eyebrow{font-size:.76rem;letter-spacing:.14em;color:#e5b29e;font-weight:800}h1{margin:7px 0 6px;font-size:clamp(1.8rem,4vw,2.6rem)}.sub{color:#d8dfdb}
+main{padding:24px 0 60px}.back{color:var(--green);font-weight:780;text-decoration:none;display:inline-block;margin-bottom:16px}.card{background:var(--paper);border:1px solid var(--line);border-radius:17px;padding:20px;box-shadow:0 8px 24px rgba(29,36,32,.05);margin-bottom:14px}
+.hidden{display:none!important}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}input,select,button{font:inherit;font-size:15px}input,select{border:1px solid #cfc8bd;background:#fff;border-radius:10px;padding:11px 12px}.btn{border:0;border-radius:10px;padding:11px 15px;background:var(--green);color:white;font-weight:800;cursor:pointer}.btn.secondary{background:#ece7df;color:#28352f}.btn:disabled{opacity:.5}.note{font-size:.86rem;color:var(--muted);line-height:1.5}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.stat{background:var(--soft);border-radius:12px;padding:14px}.stat .n{font-size:1.65rem;font-weight:850}.stat .l{font-size:.78rem;color:var(--muted);margin-top:3px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:14px}table{border-collapse:collapse;width:100%;min-width:920px;background:#fff}th,td{border-bottom:1px solid #ece6dd;padding:10px 9px;text-align:center;font-size:.86rem}th{position:sticky;top:0;background:#f4f0e9;font-weight:850;z-index:1}td.name,th.name{text-align:left}.nick{font-weight:800;color:var(--green)}.dot{display:inline-flex;min-width:25px;height:25px;border-radius:999px;align-items:center;justify-content:center;background:#e7eee9;color:var(--green);font-weight:850}.zero{color:#bbb}.clickable{cursor:pointer}.clickable:hover{background:#fbf8f2}
+.detail h2{margin:0 0 6px}.pill{display:inline-block;background:#eee8df;border-radius:999px;padding:5px 9px;margin:3px 5px 3px 0;font-size:.8rem}.entry{border-top:1px solid #ece6dd;padding:12px 0}.entry:first-child{border-top:0}.entry .meta{font-size:.77rem;color:var(--muted);margin-bottom:5px}.entry .msg{line-height:1.55}.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.tab{border:1px solid #d2cabf;border-radius:999px;background:#fff;padding:7px 10px;cursor:pointer;font-weight:750}.tab.active{background:var(--green);color:#fff;border-color:var(--green)}
+@media(max-width:720px){.summary{grid-template-columns:1fr 1fr}.wrap{padding:0 12px}.card{padding:15px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="eyebrow">MANAGEMENT INFORMATION SYSTEMS · INSTRUCTOR</div><h1>Participation Admin</h1><div class="sub">학생 닉네임과 본명을 연결해 주차별 참여를 확인합니다.</div></div></header>
+<main class="wrap">
+<a class="back" href="../">← MIS Course Materials</a>
+<section id="loginCard" class="card"><h2 style="margin-top:0">교수자 로그인</h2><div class="row"><input id="email" type="email" placeholder="교수자 이메일" style="min-width:260px"><button id="loginBtn" class="btn">Magic Link 받기</button></div><div id="loginStatus" class="note" style="margin-top:9px">등록된 교수자 이메일로 로그인 링크를 받습니다.</div></section>
+<section id="adminCard" class="hidden">
+<div class="card"><div class="row" style="justify-content:space-between"><div><strong id="userLabel"></strong><div class="note">본명·학번은 이 교수자 화면에서만 표시됩니다.</div></div><button id="logoutBtn" class="btn secondary">로그아웃</button></div>
+<div class="row" style="margin-top:14px"><select id="sectionFilter"><option value="">전체 분반</option><option value="A">A분반</option><option value="B">B분반</option><option value="C">C분반</option></select><input id="searchBox" placeholder="본명·학번·닉네임 검색" style="min-width:240px"><button id="refreshBtn" class="btn secondary">새로고침</button></div>
+<div class="summary"><div class="stat"><div id="studentCount" class="n">0</div><div class="l">표시 학생</div></div><div class="stat"><div id="linkedCount" class="n">0</div><div class="l">닉네임 연결</div></div><div class="stat"><div id="commentCount" class="n">0</div><div class="l">주차 댓글</div></div><div class="stat"><div id="liveCount" class="n">0</div><div class="l">LiveClass 응답</div></div></div>
+<div id="status" class="note" style="margin-top:12px">데이터를 불러오는 중입니다.</div>
+<div class="tablewrap"><table><thead><tr><th class="name">학생</th><th>닉네임</th><th>분반</th><th>W1</th><th>W2</th><th>W3</th><th>W4</th><th>W5</th><th>W6</th><th>W7</th><th>Live</th><th>총 참여</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
+<div id="detailCard" class="card detail hidden"></div>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://bwmbjfrrbeepfdfboqbg.supabase.co';
+const SUPABASE_KEY='sb_publishable_Ag59Uqz-yvH4AqznKHMg1g__p3sEvL0';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const loginCard=document.getElementById('loginCard'),adminCard=document.getElementById('adminCard'),email=document.getElementById('email'),loginBtn=document.getElementById('loginBtn'),loginStatus=document.getElementById('loginStatus'),logoutBtn=document.getElementById('logoutBtn'),userLabel=document.getElementById('userLabel'),sectionFilter=document.getElementById('sectionFilter'),searchBox=document.getElementById('searchBox'),refreshBtn=document.getElementById('refreshBtn'),status=document.getElementById('status'),tbody=document.getElementById('tbody'),detailCard=document.getElementById('detailCard');
+let roster=[],registry=[],comments=[],liveResponses=[],sessions=[],model=[];
+function esc(s){return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function norm(s){return String(s??'').trim().toLowerCase();}
+function weekNo(w){const m=String(w||'').match(/week0?(\d+)/i);return m?Number(m[1]):null;}
+loginBtn.onclick=async()=>{const e=email.value.trim();if(!e){loginStatus.textContent='이메일을 입력해 주세요.';return;}loginBtn.disabled=true;const redirectTo=location.origin+location.pathname;const{error}=await db.auth.signInWithOtp({email:e,options:{emailRedirectTo:redirectTo}});loginBtn.disabled=false;loginStatus.textContent=error?'로그인 링크를 보내지 못했습니다: '+error.message:'이메일을 확인해 주세요. Magic Link를 누르면 이 화면으로 돌아옵니다.';};
+logoutBtn.onclick=async()=>{await db.auth.signOut();location.reload();};
+refreshBtn.onclick=loadAll;sectionFilter.onchange=renderTable;searchBox.oninput=renderTable;
+async function authUI(){const{data:{session}}=await db.auth.getSession();if(!session){loginCard.classList.remove('hidden');adminCard.classList.add('hidden');return;}loginCard.classList.add('hidden');adminCard.classList.remove('hidden');userLabel.textContent='로그인됨 · '+session.user.email;await loadAll();}
+async function loadAll(){status.textContent='참여 데이터를 불러오는 중입니다.';detailCard.classList.add('hidden');
+ const [r1,r2,r3,r4,r5]=await Promise.all([
+  db.from('student_roster').select('id,student_number,full_name,major,grade,section_code').order('section_code').order('full_name'),
+  db.from('site_nickname_registry').select('id,nickname,nickname_key,student_id'),
+  db.from('week_participation').select('id,week_id,nickname,comment,created_at').order('created_at'),
+  db.from('live_class_responses').select('id,session_id,message,nickname,created_at,week_id').order('created_at'),
+  db.from('live_class_sessions').select('id,week_id,section_code,session_code,question,created_at')
+ ]);
+ const err=[r1.error,r2.error,r3.error,r4.error,r5.error].find(Boolean);if(err){status.textContent='데이터를 불러오지 못했습니다: '+err.message;return;}
+ roster=r1.data||[];registry=r2.data||[];comments=r3.data||[];liveResponses=r4.data||[];sessions=r5.data||[];buildModel();renderTable();status.textContent='학생 행을 클릭하면 댓글과 LiveClass 응답 내용을 확인할 수 있습니다.';
+}
+function buildModel(){
+ const regByStudent=new Map(registry.filter(x=>x.student_id!=null).map(x=>[String(x.student_id),x]));
+ const commentsByNick=new Map(),liveByNick=new Map();
+ comments.forEach(c=>{const k=norm(c.nickname);if(!commentsByNick.has(k))commentsByNick.set(k,[]);commentsByNick.get(k).push(c);});
+ liveResponses.forEach(c=>{const k=norm(c.nickname);if(!liveByNick.has(k))liveByNick.set(k,[]);liveByNick.get(k).push(c);});
+ model=roster.map(s=>{const reg=regByStudent.get(String(s.id));const nick=reg?.nickname||'';const cs=nick?commentsByNick.get(norm(nick))||[]:[];const ls=nick?liveByNick.get(norm(nick))||[]:[];const wc={};cs.forEach(c=>{const n=weekNo(c.week_id);if(n)wc[n]=(wc[n]||0)+1;});return{...s,nickname:nick,comments:cs,live:ls,wc,total:cs.length+ls.length};});
+}
+function filtered(){const sec=sectionFilter.value,q=norm(searchBox.value);return model.filter(s=>(!sec||String(s.section_code||'').toUpperCase()===sec)&&(!q||[s.full_name,s.student_number,s.nickname,s.major].some(v=>norm(v).includes(q))));}
+function renderTable(){const data=filtered();document.getElementById('studentCount').textContent=data.length;document.getElementById('linkedCount').textContent=data.filter(x=>x.nickname).length;document.getElementById('commentCount').textContent=data.reduce((a,x)=>a+x.comments.length,0);document.getElementById('liveCount').textContent=data.reduce((a,x)=>a+x.live.length,0);
+ tbody.innerHTML=data.map(s=>'<tr class="clickable" data-id="'+s.id+'"><td class="name"><strong>'+esc(s.full_name)+'</strong><br><span class="note">'+esc(s.student_number)+'</span></td><td>'+(s.nickname?'<span class="nick">'+esc(s.nickname)+'</span>':'<span class="zero">미연결</span>')+'</td><td>'+esc((s.section_code||'-').toUpperCase())+'</td>'+[1,2,3,4,5,6,7].map(w=>'<td>'+(s.wc[w]?'<span class="dot">'+s.wc[w]+'</span>':'<span class="zero">–</span>')+'</td>').join('')+'<td>'+(s.live.length?'<span class="dot">'+s.live.length+'</span>':'<span class="zero">–</span>')+'</td><td><strong>'+s.total+'</strong></td></tr>').join('');
+ tbody.querySelectorAll('tr[data-id]').forEach(tr=>tr.onclick=()=>showDetail(tr.dataset.id));
+}
+function showDetail(id){const s=model.find(x=>String(x.id)===String(id));if(!s)return;const sessionMap=new Map(sessions.map(x=>[x.id,x]));const entries=[
+ ...s.comments.map(c=>({type:'주차 댓글',week:c.week_id,text:c.comment,created_at:c.created_at,question:''})),
+ ...s.live.map(c=>{const se=sessionMap.get(c.session_id);return{type:'LiveClass',week:c.week_id||se?.week_id||'',text:c.message,created_at:c.created_at,question:se?.question||''};})
+ ].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+ detailCard.innerHTML='<h2>'+esc(s.full_name)+'</h2><div><span class="pill">학번 '+esc(s.student_number)+'</span><span class="pill">'+esc((s.section_code||'-').toUpperCase())+'분반</span><span class="pill">닉네임 '+esc(s.nickname||'미연결')+'</span></div><div class="note" style="margin:10px 0 4px">주차 댓글 '+s.comments.length+'건 · LiveClass '+s.live.length+'건</div><div>'+ (entries.length?entries.map(e=>'<div class="entry"><div class="meta">'+esc(e.type)+' · '+esc(e.week||'')+' · '+new Date(e.created_at).toLocaleString('ko-KR')+'</div>'+(e.question?'<div class="note">질문: '+esc(e.question)+'</div>':'')+'<div class="msg">'+esc(e.text)+'</div></div>').join(''):'<div class="entry note">연결된 참여 기록이 없습니다.</div>')+'</div>';
+ detailCard.classList.remove('hidden');detailCard.scrollIntoView({behavior:'smooth',block:'start'});
+}
+db.auth.onAuthStateChange(()=>setTimeout(authUI,0));authUI();
+</script>
+</body></html>
