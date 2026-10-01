@@ -39,6 +39,6 @@ async function ensureStudent(){
   else alert('닉네임을 연결하지 못했습니다. 다시 시도해 주세요.');
  }
 }
-document.querySelectorAll('a.week[href]').forEach(card=>card.addEventListener('click',async e=>{e.preventDefault();const href=card.getAttribute('href');const nick=await ensureStudent();if(!nick)return;if(confirm('본인 확인이 완료되었습니다.\n현재 닉네임은 “'+nick+'”입니다.\n이 닉네임으로 Week 자료를 열까요?'))location.href=href;}));
+document.querySelectorAll('a.week[href]').forEach(card=>card.addEventListener('click',async e=>{e.preventDefault();const href=card.getAttribute('href');const alreadyVerified=(localStorage.getItem(NICK_KEY)||'').trim()&&localStorage.getItem(PIN_OK_KEY)==='1'&&localStorage.getItem(IDENTITY_OK_KEY)==='1';if(alreadyVerified){location.href=href;return;}const nick=await ensureStudent();if(nick)location.href=href;}));
 document.querySelector('a.live-shortcut').addEventListener('click',async e=>{e.preventDefault();const nick=await ensureStudent();if(nick)location.href='live/';});
 </script></body></html>
