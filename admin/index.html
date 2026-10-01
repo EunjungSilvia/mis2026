@@ -16,7 +16,7 @@ main{padding:24px 0 60px}.back{color:var(--green);font-weight:780;text-decoratio
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="eyebrow">MANAGEMENT INFORMATION SYSTEMS · INSTRUCTOR</div><h1>Participation Admin</h1><div class="sub">학생 닉네임과 본명을 연결해 주차별 참여를 확인합니다.</div></div></header>
+<header><div class="wrap"><div class="eyebrow">MANAGEMENT INFORMATION SYSTEMS · INSTRUCTOR</div><h1>Participation Admin</h1><div id="adminSub" class="sub hidden">학생 닉네임과 본명을 연결해 주차별 참여를 확인합니다.</div></div></header>
 <main class="wrap">
 <a class="back" href="../">← MIS Course Materials</a>
 <section id="loginCard" class="card"><h2 style="margin-top:0">교수자 로그인</h2><div class="row"><input id="email" type="email" placeholder="교수자 이메일" style="min-width:260px"><button id="loginBtn" class="btn">Magic Link 받기</button></div><div id="loginStatus" class="note" style="margin-top:9px">등록된 교수자 이메일로 로그인 링크를 받습니다.</div></section>
@@ -34,7 +34,7 @@ main{padding:24px 0 60px}.back{color:var(--green);font-weight:780;text-decoratio
 const SUPABASE_URL='https://bwmbjfrrbeepfdfboqbg.supabase.co';
 const SUPABASE_KEY='sb_publishable_Ag59Uqz-yvH4AqznKHMg1g__p3sEvL0';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const loginCard=document.getElementById('loginCard'),adminCard=document.getElementById('adminCard'),email=document.getElementById('email'),loginBtn=document.getElementById('loginBtn'),loginStatus=document.getElementById('loginStatus'),logoutBtn=document.getElementById('logoutBtn'),userLabel=document.getElementById('userLabel'),sectionFilter=document.getElementById('sectionFilter'),searchBox=document.getElementById('searchBox'),refreshBtn=document.getElementById('refreshBtn'),status=document.getElementById('status'),tbody=document.getElementById('tbody'),detailCard=document.getElementById('detailCard');
+const loginCard=document.getElementById('loginCard'),adminCard=document.getElementById('adminCard'),adminSub=document.getElementById('adminSub'),email=document.getElementById('email'),loginBtn=document.getElementById('loginBtn'),loginStatus=document.getElementById('loginStatus'),logoutBtn=document.getElementById('logoutBtn'),userLabel=document.getElementById('userLabel'),sectionFilter=document.getElementById('sectionFilter'),searchBox=document.getElementById('searchBox'),refreshBtn=document.getElementById('refreshBtn'),status=document.getElementById('status'),tbody=document.getElementById('tbody'),detailCard=document.getElementById('detailCard');
 let roster=[],registry=[],comments=[],liveResponses=[],sessions=[],model=[];
 function esc(s){return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
 function norm(s){return String(s??'').trim().toLowerCase();}
@@ -42,7 +42,7 @@ function weekNo(w){const m=String(w||'').match(/week0?(\d+)/i);return m?Number(m
 loginBtn.onclick=async()=>{const e=email.value.trim();if(!e){loginStatus.textContent='이메일을 입력해 주세요.';return;}loginBtn.disabled=true;const redirectTo=location.origin+location.pathname;const{error}=await db.auth.signInWithOtp({email:e,options:{emailRedirectTo:redirectTo}});loginBtn.disabled=false;loginStatus.textContent=error?'로그인 링크를 보내지 못했습니다: '+error.message:'이메일을 확인해 주세요. Magic Link를 누르면 이 화면으로 돌아옵니다.';};
 logoutBtn.onclick=async()=>{await db.auth.signOut();location.reload();};
 refreshBtn.onclick=loadAll;sectionFilter.onchange=renderTable;searchBox.oninput=renderTable;
-async function authUI(){const{data:{session}}=await db.auth.getSession();if(!session){loginCard.classList.remove('hidden');adminCard.classList.add('hidden');return;}loginCard.classList.add('hidden');adminCard.classList.remove('hidden');userLabel.textContent='로그인됨 · '+session.user.email;await loadAll();}
+async function authUI(){const{data:{session}}=await db.auth.getSession();if(!session){loginCard.classList.remove('hidden');adminCard.classList.add('hidden');return;}loginCard.classList.add('hidden');adminCard.classList.remove('hidden');adminSub.classList.remove('hidden');userLabel.textContent='로그인됨 · '+session.user.email;await loadAll();}
 async function loadAll(){status.textContent='참여 데이터를 불러오는 중입니다.';detailCard.classList.add('hidden');
  const [r1,r2,r3,r4,r5]=await Promise.all([
   db.from('student_roster').select('id,student_number,full_name,major,grade,section_code').order('section_code').order('full_name'),
