@@ -12,29 +12,30 @@ async function ensureStudent(){
  const saved=(localStorage.getItem(NICK_KEY)||'').trim();
  if(saved&&localStorage.getItem(PIN_OK_KEY)==='1'&&localStorage.getItem(IDENTITY_OK_KEY)==='1')return saved;
  while(true){
-  const nr=prompt('학생 본인 확인을 위해 이름을 입력해 주세요.'); if(nr===null)return '';
-  const name=nr.trim(); if(!name){alert('이름을 입력해 주세요.');continue;}
-  const sr=prompt('학번을 입력해 주세요.'); if(sr===null)return '';
-  const no=sr.trim(); if(!no){alert('학번을 입력해 주세요.');continue;}
+  const rr=prompt('수업에서 사용할 닉네임을 입력해 주세요.\n기존에 사용하던 닉네임이 있다면 같은 닉네임을 입력하세요.',saved);
+  if(rr===null)return ''; const nick=rr.trim().slice(0,30); if(!nick){alert('닉네임을 입력해 주세요.');continue;}
+  const ns=await nickStatus(nick); if(!ns||!ns.ok){alert('닉네임 상태를 확인하지 못했습니다. 다시 시도해 주세요.');continue;}
+  const nr=prompt('닉네임을 본인과 연결하기 위해 이름을 확인합니다.\n본명을 입력해 주세요.');
+  if(nr===null)return ''; const name=nr.trim(); if(!name){alert('이름을 입력해 주세요.');continue;}
+  const sr=prompt('학번을 입력해 주세요.'); if(sr===null)return ''; const no=sr.trim(); if(!no){alert('학번을 입력해 주세요.');continue;}
   const st=await studentStatus(name,no);
   if(!st.ok){alert(st.code==='no_match'?'이름과 학번이 학생 명단과 일치하지 않습니다. 다시 확인해 주세요.':'학생 정보를 확인하지 못했습니다. 다시 시도해 주세요.');continue;}
   if(st.has_nickname){
-   const pr=askPin('등록된 닉네임은 “'+st.nickname+'”입니다.\n4자리 PIN을 입력해 주세요.'); if(pr.cancelled)return ''; if(pr.invalid)continue;
+   if(st.nickname.toLowerCase()!==nick.toLowerCase()){alert('이 학생에게 이미 다른 닉네임이 등록되어 있습니다.\n등록한 닉네임을 확인해 주세요.');continue;}
+   const pr=askPin('등록된 닉네임 “'+st.nickname+'”의 4자리 PIN을 입력해 주세요.'); if(pr.cancelled)return ''; if(pr.invalid)continue;
    const v=await verifyNick(st.nickname,pr.pin);
    if(v.ok)return saveVerified(v.nickname);
    alert(v.code==='wrong_pin'?'PIN이 일치하지 않습니다. 다시 입력해 주세요.':'닉네임을 확인하지 못했습니다.');continue;
   }
-  const rr=prompt('사용할 닉네임을 입력해 주세요.\n기존에 사용하던 닉네임이 있다면 같은 닉네임을 입력하세요.');
-  if(rr===null)return ''; const nick=rr.trim().slice(0,30); if(!nick){alert('닉네임을 입력해 주세요.');continue;}
-  const ns=await nickStatus(nick); if(!ns||!ns.ok){alert('닉네임 상태를 확인하지 못했습니다.');continue;}
-  const pr=askPin(ns.status==='registered'?'기존 닉네임의 4자리 PIN을 입력해 주세요.':ns.status==='legacy'?'기존 닉네임입니다. 앞으로 사용할 4자리 PIN을 설정해 주세요.':'새 닉네임입니다. 사용할 4자리 PIN을 설정해 주세요.');
+  const pr=askPin(ns.status==='registered'?'기존 닉네임입니다. 등록한 4자리 PIN을 입력해 주세요.':ns.status==='legacy'?'기존 활동 기록이 있는 닉네임입니다. 앞으로 사용할 4자리 PIN을 설정해 주세요.':'새 닉네임입니다. 사용할 4자리 PIN을 설정해 주세요.');
   if(pr.cancelled)return ''; if(pr.invalid)continue;
-  let fn=ns.status==='registered'?'link_student_nickname':ns.status==='legacy'?'claim_student_legacy_nickname':'claim_student_nickname';
+  const fn=ns.status==='registered'?'link_student_nickname':ns.status==='legacy'?'claim_student_legacy_nickname':'claim_student_nickname';
   const{data,error}=await db.rpc(fn,{p_full_name:name,p_student_number:no,p_nickname:nick,p_pin:pr.pin});
   if(!error&&data&&data.ok)return saveVerified(data.nickname);
   const code=data&&data.code;
   if(code==='wrong_pin')alert('PIN이 일치하지 않습니다. 다시 입력해 주세요.');
   else if(code==='taken'||code==='nickname_linked')alert('이미 다른 학생에게 연결된 닉네임입니다.');
+  else if(code==='student_registered')alert('이 학생에게 이미 닉네임이 등록되어 있습니다.');
   else alert('닉네임을 연결하지 못했습니다. 다시 시도해 주세요.');
  }
 }
