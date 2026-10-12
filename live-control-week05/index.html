@@ -8,7 +8,7 @@
 .discussion-panel{margin-top:20px;border-top:2px solid #d9d2c7;padding-top:18px}.discussion-list{max-height:330px;overflow:auto;background:#f7f6f2;border-radius:12px;padding:10px}.discussion-msg{background:white;border:1px solid #ddd;border-radius:10px;padding:10px;margin:8px 0}.discussion-msg.selected{border:2px solid #b44d35}.discussion-msg.prof{background:#e6f0e9;border-color:#a9c5b4}.discussion-msg button{margin-top:7px}.discussion-quote{padding:8px;border-left:3px solid #b44d35;background:#fff8f1;margin-bottom:8px}.discussion-panel textarea{width:100%;min-height:80px;margin:8px 0;padding:10px;border:1px solid #ccc;border-radius:8px}</style>
 </head>
 <body>
-<header><div class="wrap"><div class="eyebrow">MANAGEMENT INFORMATION SYSTEMS · INSTRUCTOR</div><h1>Live Class Control</h1><div class="sub">Week 05 · 디지털 비즈니스와 비즈니스모델</div></div></header>
+<header><div class="wrap"><div class="eyebrow">MANAGEMENT INFORMATION SYSTEMS · INSTRUCTOR</div><h1>Live Class Control</h1><div class="sub">Week 05 · IT 인프라와 네트워크</div></div></header>
 <main class="wrap"><a class="back" href="../">← MIS Course Materials</a>
 <section id="loginCard" class="card"><h2>교수자 로그인</h2><div class="loginrow"><input id="email" type="email" autocomplete="email" placeholder="교수자 이메일"><button id="loginBtn" class="btn">Magic Link 받기</button></div><div id="loginStatus" class="note"></div></section>
 <section id="controlCard" class="card hidden">
@@ -17,7 +17,7 @@
 <div class="statusrow" style="margin-top:14px"><div id="currentStatus" class="status">현재 상태를 확인하는 중입니다.</div><button id="closeCurrentBtn" class="btn danger hidden">현재 질문 닫기</button></div>
 <div class="discussion-panel"><h3>실시간 토론 · 학생 의견에서 후속 질문 만들기</h3><div id="discussionState" class="note">열린 세션을 선택하면 대화가 표시됩니다.</div><div id="discussionList" class="discussion-list"></div><div id="selectedQuote" class="discussion-quote hidden"></div><button id="clearQuote" class="btn secondary hidden" type="button">인용 취소</button><textarea id="followupText" maxlength="500" placeholder="학생 의견을 바탕으로 다음 질문을 작성하세요."></textarea><button id="postFollowup" class="btn" type="button">후속 질문 게시</button><div id="followupStatus" class="note"></div></div><div class="section-label">PLANNED · 공식 수업 질문</div>
 <div id="plannedList"></div>
-<div class="section-label">AD HOC · 현장 질문</div><div class="adhoc"><h3>수업 중 추가 질문</h3><textarea id="adhocQuestion" maxlength="300" placeholder="학생 반응에 따라 지금 묻고 싶은 질문을 입력하세요."></textarea><div class="actions"><button id="openAdhocBtn" class="btn">지금 열기</button></div><div id="adhocStatus" class="note">Week 05 질문은 교수자 화면에서 현장 질문으로 등록할 수 있습니다.</div><div class="adhoc-history"><h4>최근 Ad hoc 질문 · 선택한 분반</h4><div id="adhocHistory"></div></div></div>
+<div class="section-label">AD HOC · 현장 질문</div><div class="adhoc"><h3>수업 중 추가 질문</h3><textarea id="adhocQuestion" maxlength="300" placeholder="학생 반응에 따라 지금 묻고 싶은 질문을 입력하세요."></textarea><div class="actions"><button id="openAdhocBtn" class="btn">지금 열기</button></div><div id="adhocStatus" class="note">Week 05 Live Class 1이 예정 질문으로 등록되어 있습니다. 해당 분반에서 열어주세요.</div><div class="adhoc-history"><h4>최근 Ad hoc 질문 · 선택한 분반</h4><div id="adhocHistory"></div></div></div>
 <div class="note">다시 열기는 기존 응답과 함께 이어서 진행합니다. 새 세션은 같은 질문으로 응답을 처음부터 다시 받습니다. 삭제는 해당 Ad hoc 질문과 그 응답을 함께 삭제합니다.</div>
 </section>
 </main>
