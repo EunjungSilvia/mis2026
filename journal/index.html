@@ -42,6 +42,28 @@ table.sheet{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom
 .cellin{display:block;width:100%;border:0;resize:none;overflow:hidden;padding:9px 10px;line-height:1.55;font-size:.95rem;background:transparent;color:#1f2328;min-height:40px}
 .cellin:focus{outline:2px solid #4b8a6c;outline-offset:-2px;background:#fbfdfb}
 @media(max-width:760px){.sheet,.sheet tbody,.sheet tr,.sheet th,.sheet td{display:block;width:100%!important}.sheet thead{display:none}.sheet td{border-top:0}.sheet td[data-l]::before{content:attr(data-l);display:block;font-size:.8rem;color:#6b6f73;padding:6px 10px 0}}
+#printArea{display:none}
+@media print{
+  @page{size:A4;margin:16mm 14mm}
+  html,body{background:#fff!important}
+  .shell{display:none!important}
+  #printArea{display:block}
+  .psheet{page-break-after:always;break-after:page;font-size:10.5pt;color:#111}
+  .psheet:last-child{page-break-after:auto;break-after:auto}
+  .psheet .kicker{color:#2563b8;font-weight:800;font-size:10pt;margin-bottom:4px}
+  .psheet h1{font-size:20pt;margin:0 0 8px}
+  .psheet .pmeta{display:flex;gap:14px;font-size:10pt;border:1px solid #ccc;border-radius:6px;padding:6px 10px;margin-bottom:10px;background:#f7f6f2}
+  .psheet .sh{font-size:11.5pt;margin:14px 0 6px}
+  .psheet table.sheet{width:100%;border-collapse:collapse;table-layout:fixed;page-break-inside:auto}
+  .psheet .sheet tr{page-break-inside:avoid;break-inside:avoid}
+  .psheet .sheet th,.psheet .sheet td{border:1px solid #9a9ea6;vertical-align:middle;padding:0}
+  .psheet .sheet th{background:#efeee9;text-align:left;font-weight:700;padding:7px 8px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .psheet .sheet.kv th{width:33%}.psheet .sheet.grid thead th:first-child,.psheet .sheet .rl{width:23%}
+  .pval{white-space:pre-wrap;word-break:break-word;padding:7px 8px;line-height:1.5;min-height:28px}
+  .pval.tall{min-height:70px}
+  .pfoot{margin-top:10px;font-size:8.5pt;color:#777}
+}
+.pdfbtn{float:right}
 @media(max-width:760px){.shell{margin:0;border-radius:0;border:0}.body{flex-direction:column}nav{width:auto;display:flex;overflow-x:auto;gap:4px;padding:10px 12px;border-bottom:1px solid var(--line)}nav button{width:auto;white-space:nowrap;gap:6px;margin:0}.content{padding:18px 16px 50px}.top,.who{padding:14px 16px}}
 </style></head><body>
 <div class="shell">
@@ -82,6 +104,7 @@ table.sheet{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom
     </div>
   </section>
 </div>
+<div id="printArea"></div>
 <script src="weeks.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -181,7 +204,7 @@ function renderHome(){
     const right=!p.open?'<span class="pill">준비 중</span>':(done?'<span class="pill" style="background:#e6f3ea;color:#24704a">작성함</span>':'<span class="pill">작성 전</span>');
     return '<div class="box row'+(p.open?'':' locked')+'" data-p="'+p.id+'"><div><div class="t">'+esc(p.label)+'</div><div class="d">'+esc(desc)+'</div></div>'+right+'</div>';
   }).join('');
-  $('content').innerHTML='<h1>'+esc(profile.full_name)+'님의 학습기록</h1><p class="lead">10~12주차 AI 미니 미션을 마칠 때마다 이곳에 기록을 남깁니다. 쌓인 기록은 13주차 워크숍에서 다시 꺼내 나의 AX Canvas로 정리합니다.</p>'+rows;
+  $('content').innerHTML='<h1>'+esc(profile.full_name)+'님의 학습기록</h1><p class="lead">10~12주차 AI 미니 미션을 마칠 때마다 이곳에 기록을 남깁니다. 쌓인 기록은 13주차 워크숍에서 다시 꺼내 나의 AX Canvas로 정리합니다.</p><div style="margin-bottom:14px"><button class="btn-ghost" id="pdfAll">작성한 기록 전체 PDF로 저장</button></div>'+rows;
   $('content').querySelectorAll('.box.row:not(.locked)').forEach(b=>b.onclick=()=>go(b.dataset.p));
   setState('ok','');
 }
@@ -200,7 +223,7 @@ function renderWeek(w){
     }
     return h;
   }).join('');
-  $('content').innerHTML='<div class="paper"><div class="kicker">경영정보시스템 · '+w+'주차</div><h1 class="ptitle">'+esc(cfg.sheetTitle||'러닝 저널')+'</h1>'+
+  $('content').innerHTML='<div class="paper"><button class="btn-ghost pdfbtn" id="pdfBtn">PDF로 저장</button><div class="kicker">경영정보시스템 · '+w+'주차</div><h1 class="ptitle">'+esc(cfg.sheetTitle||'러닝 저널')+'</h1>'+
     '<div class="pmeta"><span>작성자 <strong>'+esc(profile.full_name)+'</strong></span><span>학번 '+esc(profile.student_number)+'</span><span>'+esc(profile.section_code||'')+'분반</span></div>'+
     '<p class="plead">미션을 마친 뒤 아래 칸을 채운다. 입력을 멈추면 자동으로 저장되고, 언제든 다시 들어와 고칠 수 있다.</p>'+secs+'</div>';
   const fit=el=>{el.style.height='auto';el.style.height=Math.max(el.scrollHeight,el.classList.contains('tall')?110:40)+'px'};
@@ -211,6 +234,39 @@ function renderWeek(w){
   });
   dirty=false;setState('ok',journals[w]?'저장된 기록 불러옴':'입력하면 자동 저장');
 }
+function sheetHTML(w){
+  const cfg=WEEKS.find(x=>x.week===w);const r=journals[w]?.responses||{};
+  const pv=(v,tall)=>'<div class="pval'+(tall?' tall':'')+'">'+esc(v)+'</div>';
+  const secs=cfg.sections.map(s=>{
+    let h=s.title?'<h3 class="sh">'+esc(s.title)+'</h3>':'';
+    if(s.layout==='grid'){
+      h+='<table class="sheet grid"><thead><tr>'+s.cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+
+        s.rows.map(row=>'<tr><th class="rl">'+esc(row.label)+'</th>'+row.keys.map(k=>'<td>'+pv(r[k],true)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+    } else if(s.layout==='block'){
+      h+='<table class="sheet"><tbody>'+s.fields.map(f=>'<tr><th>'+esc(f.label)+'</th></tr><tr><td>'+pv(r[f.key],true)+'</td></tr>').join('')+'</tbody></table>';
+    } else {
+      h+='<table class="sheet kv"><tbody>'+s.fields.map(f=>'<tr><th>'+esc(f.label)+'</th><td>'+pv(r[f.key],s.tall)+'</td></tr>').join('')+'</tbody></table>';
+    }
+    return h;
+  }).join('');
+  const at=journals[w]?.updated_at?new Date(journals[w].updated_at).toLocaleString('ko-KR'):'';
+  return '<section class="psheet"><div class="kicker">경영정보시스템 · '+w+'주차</div><h1>'+esc(cfg.sheetTitle||'러닝 저널')+'</h1>'+
+    '<div class="pmeta"><span>작성자 <strong>'+esc(profile.full_name)+'</strong></span><span>학번 '+esc(profile.student_number)+'</span><span>'+esc(profile.section_code||'')+'분반</span></div>'+
+    secs+(at?'<div class="pfoot">마지막 저장 '+esc(at)+' · MIS 2026 My AX Workspace</div>':'')+'</section>';
+}
+async function doPrint(weeks){
+  await flush();
+  const list=weeks.filter(w=>{const c=WEEKS.find(x=>x.week===w);return c&&c.open&&c.sections.length});
+  if(!list.length)return;
+  $('printArea').innerHTML=list.map(sheetHTML).join('');
+  const old=document.title;
+  document.title='러닝저널_'+(list.length===1?list[0]+'주차':list[0]+'-'+list[list.length-1]+'주차')+'_'+profile.full_name+'_'+profile.student_number;
+  setTimeout(()=>{window.print();setTimeout(()=>{document.title=old},500)},50);
+}
+document.addEventListener('click',e=>{
+  if(e.target.id==='pdfBtn')doPrint([week]);
+  if(e.target.id==='pdfAll')doPrint(WEEKS.filter(w=>w.open&&hasContent(w.week)).map(w=>w.week));
+});
 function collect(){const r={};$('content').querySelectorAll('[data-key]').forEach(el=>r[el.dataset.key]=el.value);return r}
 function schedule(){clearTimeout(timer);timer=setTimeout(()=>{timer=null;save()},900)}
 async function flush(){clearTimeout(timer);timer=null;await save()}
