@@ -29,8 +29,16 @@ footer{color:#78847a;text-align:center;padding:25px 12px;font-size:.8rem}
 <button id="signin" class="primary">로그인 링크 받기</button>
 <p id="loginMessage" class="notice hidden" role="status"></p>
 </section>
-<section id="journal" class="hidden">
-<div class="eyebrow">MANAGEMENT INFORMATION SYSTEMS · WEEK 10</div><h1>러닝 저널</h1>
+<section id="enroll" class="card account hidden">
+<div class="eyebrow">FIRST VISIT · STUDENT VERIFICATION</div><h1>수강생 확인</h1>
+<p class="lead">처음 한 번만 이름·학번과 교수자가 안내한 개인 등록코드를 입력해 주세요. 수강생 명단과 일치하면 이 이메일 계정에 학생 정보가 연결됩니다.</p>
+<div class="field"><label for="studentName">이름</label><input class="input" id="studentName" autocomplete="name" maxlength="100" placeholder="학생명단에 등록된 이름"></div>
+<div class="field"><label for="studentNumber">학번</label><input class="input" id="studentNumber" inputmode="numeric" maxlength="40" placeholder="학번"></div>
+<div class="field"><label for="inviteCode">개인 등록코드</label><input class="input" id="inviteCode" maxlength="24" autocomplete="off" spellcheck="false" placeholder="교수자가 안내한 24자리 코드"></div>
+<button class="primary" id="enrollButton">학생 정보 연결</button>
+<p class="notice hidden" id="enrollMessage" role="status"></p>
+</section>\n<section id="journal" class="hidden">
+<div class="eyebrow">MANAGEMENT INFORMATION SYSTEMS · WEEK 10</div><h1>러닝 저널</h1><p class="hint" id="studentProfile"></p>
 <p class="lead">미션을 마친 뒤 아래 칸을 채웁니다. 별도의 제출 버튼은 없습니다. 입력을 잠시 멈추면 자동으로 저장되고, 언제든 수정할 수 있습니다.</p>
 <div class="notice">내용이 저장되었는지 오른쪽 상단의 <strong>저장됨</strong> 표시를 확인해 주세요. 저장 실패 시 인터넷 연결을 확인하고 화면을 닫지 마세요.</div>
 <section class="card"><div class="field"><label for="interest">내 관심 대상</label><input class="input" id="interest" data-field="interest"></div>
@@ -54,12 +62,12 @@ footer{color:#78847a;text-align:center;padding:25px 12px;font-size:.8rem}
  const URL='https://bwmbjfrrbeepfdfboqbg.supabase.co';
  const KEY='sb_publishable_Ag59Uqz-yvH4AqznKHMg1g__p3sEvL0';
  const db=window.supabase.createClient(URL,KEY);
- const login=document.getElementById('login'), journal=document.getElementById('journal'), logout=document.getElementById('logout');
+ const login=document.getElementById('login'), enroll=document.getElementById('enroll'), journal=document.getElementById('journal'), logout=document.getElementById('logout');
  const status=document.getElementById('saveStatus'),label=document.getElementById('saveText');
  const fields=[...document.querySelectorAll('[data-field]')];
  let user=null, data={}, dirty=false, timer=null, activeSave=null, rev=0, lastSavedRev=0;
  const state=(kind,message)=>{status.dataset.state=kind;label.textContent=message};
- const show=(logged)=>{login.classList.toggle('hidden',logged);journal.classList.toggle('hidden',!logged);logout.classList.toggle('hidden',!logged);status.classList.toggle('hidden',!logged)};
+ const show=(mode)=>{login.classList.toggle('hidden',mode!=='login');enroll.classList.toggle('hidden',mode!=='enroll');journal.classList.toggle('hidden',mode!=='journal');logout.classList.toggle('hidden',mode==='login');status.classList.toggle('hidden',mode!=='journal')};\n async function verifiedEntry(){\n  const {data:profile,error}=await db.rpc('my_journal_student_profile');\n  if(error){show('enroll');const m=document.getElementById('enrollMessage');m.classList.remove('hidden');m.classList.add('error');m.textContent='학생 정보 확인 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';return}\n  if(!profile?.linked){show('enroll');return}\n  document.getElementById('studentProfile').textContent=profile.full_name+' · '+(profile.section_code||'분반 미지정')+' · '+profile.student_number;\n  show('journal');await load();\n }\n document.getElementById('enrollButton').onclick=async()=>{\n  const b=document.getElementById('enrollButton'),m=document.getElementById('enrollMessage');\n  const name=document.getElementById('studentName').value.trim();\n  const number=document.getElementById('studentNumber').value.trim();\n  const code=document.getElementById('inviteCode').value.trim();\n  m.classList.remove('hidden','error');\n  if(!name||!number||!/^[a-f0-9]{24}$/i.test(code)){m.textContent='이름·학번·24자리 등록코드를 모두 확인해 주세요.';m.classList.add('error');return}\n  b.disabled=true;\n  const {data:result,error}=await db.rpc('claim_journal_student_identity',{p_full_name:name,p_student_number:number,p_code:code});\n  b.disabled=false;\n  if(error||!result?.ok){m.textContent='학생명단 또는 등록코드가 일치하지 않거나 이미 연결된 계정입니다. 정보를 확인해 주세요.';m.classList.add('error');return}\n  document.getElementById('inviteCode').value='';await verifiedEntry();\n };
  function collect(){const r={};fields.forEach(el=>r[el.dataset.field]=el.value);return r}
  function render(record){fields.forEach(el=>el.value=record?.[el.dataset.field]||'');data=collect()}
  async function load(){
@@ -94,7 +102,7 @@ footer{color:#78847a;text-align:center;padding:25px 12px;font-size:.8rem}
    else m.textContent='이메일로 로그인 링크를 보냈습니다. 받은 편지함에서 링크를 열어 주세요.';
  };
  logout.onclick=async()=>{if(timer){clearTimeout(timer);timer=null}if(dirty)await save();if(dirty){alert('저장되지 않은 내용이 있습니다. 연결을 확인하고 다시 시도해 주세요.');return}await db.auth.signOut();user=null;show(false)};
- async function boot(){const {data:{user:u}}=await db.auth.getUser();user=u;if(u){show(true);await load()}else show(false)}
+ async function boot(){const {data:{user:u}}=await db.auth.getUser();user=u;if(u){await verifiedEntry()}else show('login')}
  db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){user=null;show(false)}});
  boot().catch(()=>{document.getElementById('loginMessage').textContent='연결 오류가 발생했습니다. 새로고침해 주세요.';document.getElementById('loginMessage').classList.remove('hidden')});
 })();
