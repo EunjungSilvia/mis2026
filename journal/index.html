@@ -14,10 +14,10 @@
 .dot{height:8px;width:8px;border-radius:50%;background:#b5b9bd}.saved[data-state="ok"] .dot{background:#2f9e63}.saved[data-state="error"] .dot{background:#d0533f}.saved[data-state="busy"] .dot{background:#e0a635}
 .btn-ghost{background:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 12px;cursor:pointer;font-size:.86rem;color:#3d4247}
 .body{display:flex;flex:1}
-nav{width:190px;flex:none;padding:22px 14px 22px 18px}
+nav{width:215px;flex:none;padding:22px 14px 22px 18px}
 nav button{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;border:0;background:none;padding:10px 10px;border-radius:10px;cursor:pointer;color:#3d4247;font-size:.95rem;margin-bottom:2px}
 nav button:hover:not(:disabled){background:var(--soft)}nav button.on{background:var(--soft);font-weight:800;color:var(--ink)}
-nav button:disabled{color:#a9adb1;cursor:default}nav .tag{font-size:.72rem;color:#9aa0a5}nav .done{font-size:.72rem;color:#2f9e63;font-weight:700}
+nav button:disabled{color:#a9adb1;cursor:default}nav .tag{font-size:.72rem;color:#9aa0a5;white-space:nowrap;margin-left:6px}nav .done{font-size:.72rem;color:#2f9e63;font-weight:700}
 .content{flex:1;padding:24px 28px 60px;min-width:0}
 h1{font-size:1.45rem;margin:2px 0 6px}h2{font-size:1.08rem;margin:0 0 12px}.lead{color:var(--muted);line-height:1.65;font-size:.95rem;margin:0 0 18px}
 .box{border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:14px;background:#fff}
@@ -35,7 +35,7 @@ textarea{min-height:96px;resize:vertical}.input:focus,textarea:focus{outline:2px
 @media(max-width:760px){.shell{margin:0;border-radius:0;border:0}.body{flex-direction:column}nav{width:auto;display:flex;overflow-x:auto;gap:4px;padding:10px 12px;border-bottom:1px solid var(--line)}nav button{width:auto;white-space:nowrap;gap:6px;margin:0}.content{padding:18px 16px 50px}.top,.who{padding:14px 16px}}
 </style></head><body>
 <div class="shell">
-  <div class="top"><div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>My AX Workspace</div><span class="pill">학생 개인 공간</span></div>
+  <div class="top"><div class="title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>My AX Workspace</div><div style="display:flex;gap:10px;align-items:center"><a href="../" style="font-size:.86rem;color:#3d4247;text-decoration:none">MIS Learning Hub</a><span class="pill">학생 개인 공간</span></div></div>
 
   <!-- 로그인 -->
   <section id="login" class="account">
