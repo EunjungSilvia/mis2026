@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MIS · 내 러닝 저널</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR",sans-serif;color:#1d2b25;background:#f5f3ef}
+*{box-sizing:border-box}body{margin:0}button,input,textarea{font:inherit}
+header{background:#203d32;color:white;padding:22px max(18px,calc((100vw - 900px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-size:.8rem;color:#c9e0d2;letter-spacing:.1em}.brand{font-size:1.3rem;font-weight:750;margin-top:4px}
+.logout{background:transparent;color:white;border:1px solid #91ad9c;border-radius:8px;padding:9px 13px;cursor:pointer}
+main{max-width:900px;margin:auto;padding:26px 18px 80px}h1{font-size:clamp(1.7rem,4vw,2.3rem);margin:7px 0 12px}h2{font-size:1.15rem;margin:0 0 14px}
+.eyebrow{font-size:.78rem;color:#52695d;font-weight:750;letter-spacing:.1em}.lead{line-height:1.7;color:#56645a;font-size:.96rem}
+.card{background:white;border:1px solid #dfdfd8;border-radius:15px;padding:24px;margin-top:18px;box-shadow:0 4px 20px #182a1608}
+.field{margin:16px 0}.field label{display:block;font-weight:650;margin-bottom:9px;line-height:1.5}.hint{font-size:.85rem;color:#627167;margin-top:6px;line-height:1.5}
+.input,textarea{width:100%;border:1px solid #bbc7bc;border-radius:9px;padding:12px 13px;background:white;color:#182920;line-height:1.55}
+textarea{min-height:100px;resize:vertical}.input:focus,textarea:focus{outline:2px solid #44866a;border-color:#44866a}
+.account{max-width:520px;margin:30px auto}.primary{background:#245943;color:white;border:0;padding:12px 16px;border-radius:9px;font-weight:700;cursor:pointer}.primary:disabled{opacity:.6;cursor:wait}
+.linkbtn{background:none;border:0;color:#245943;font-weight:700;text-decoration:underline;cursor:pointer;padding:0}
+.notice{padding:12px 14px;border-radius:9px;background:#edf3ed;font-size:.92rem;line-height:1.6;color:#2c5942;margin-top:14px}.error{background:#fff0ed;color:#a13b2d}.hidden{display:none!important}
+.saved{display:flex;gap:8px;align-items:center;font-size:.9rem;white-space:nowrap;color:#d9e7de}
+.dot{height:8px;width:8px;border-radius:50%;background:#8c9d91}.saved[data-state="ok"] .dot{background:#4fd18f}.saved[data-state="error"] .dot{background:#ff7a66}.saved[data-state="busy"] .dot{background:#f2bb4b}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 4px}.tab{border:1px solid #c9d2ca;background:white;border-radius:999px;padding:9px 15px;cursor:pointer;font-weight:700;color:#2b4a3c}
+.tab.active{background:#245943;color:white;border-color:#245943}.tab:disabled{color:#a3aea6;cursor:not-allowed;background:#f1f1ec}.tab .mark{font-size:.75rem;margin-left:6px;opacity:.85}
+footer{color:#78847a;text-align:center;padding:25px 12px;font-size:.8rem}
+@media(max-width:700px){header{padding:16px}.brand{font-size:1.04rem}.card{padding:18px}}
+</style></head><body>
+<header><div><div class="logo">MIS 2026 · MY AX WORKSPACE</div><div class="brand">내 러닝 저널</div></div>
+<div style="display:flex;gap:13px;align-items:center"><div class="saved hidden" id="saveStatus" role="status" aria-live="polite" data-state="ok"><span class="dot"></span><span id="saveText">저장됨</span></div><button id="logout" class="logout hidden">로그아웃</button></div></header>
+<main>
+
+<section id="login" class="card account">
+  <div class="eyebrow">MY LEARNING JOURNAL</div><h1>내 저널 열기</h1>
+  <p class="lead">수업 사이트에서 쓰던 <strong>닉네임</strong>과 <strong>4자리 PIN</strong>으로 들어갑니다. 내 기록은 나와 교수자만 볼 수 있습니다.</p>
+  <div class="field"><label for="nick">닉네임</label><input id="nick" class="input" maxlength="30" autocomplete="username"></div>
+  <div class="field"><label for="pin">PIN (숫자 4자리)</label><input id="pin" class="input" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password"></div>
+  <button id="openBtn" class="primary">저널 열기</button>
+  <p class="hint">닉네임을 만든 적이 없거나 실명 인증을 하지 않았다면 <button class="linkbtn" id="toLink">처음 연결하기</button>를 눌러 주세요.</p>
+  <p id="loginMsg" class="notice hidden" role="status"></p>
+</section>
+
+<section id="link" class="card account hidden">
+  <div class="eyebrow">FIRST VISIT · 실명 확인</div><h1>처음 연결하기</h1>
+  <p class="lead">이름과 학번을 수강생 명단과 확인한 뒤, 앞으로 쓸 닉네임과 PIN을 연결합니다. 이미 닉네임이 있다면 같은 닉네임과 PIN을 입력하세요.</p>
+  <div class="field"><label for="lname">이름</label><input id="lname" class="input" maxlength="100" autocomplete="name"></div>
+  <div class="field"><label for="lno">학번</label><input id="lno" class="input" inputmode="numeric" maxlength="40"></div>
+  <div class="field"><label for="lnick">닉네임</label><input id="lnick" class="input" maxlength="30"></div>
+  <div class="field"><label for="lpin">PIN (숫자 4자리)</label><input id="lpin" class="input" type="password" inputmode="numeric" maxlength="4"><p class="hint">새 닉네임이면 지금 정한 숫자 4자리가 PIN이 됩니다. 잊지 않게 기억해 두세요.</p></div>
+  <button id="linkBtn" class="primary">확인하고 저널 열기</button> <button class="linkbtn" id="backLogin" style="margin-left:12px">돌아가기</button>
+  <p id="linkMsg" class="notice hidden" role="status"></p>
+</section>
+
+<section id="journal" class="hidden">
+  <div class="eyebrow">MANAGEMENT INFORMATION SYSTEMS · AI 미니 미션 저널</div>
+  <h1 id="weekTitle">러닝 저널</h1>
+  <p class="hint" id="profile"></p>
+  <div class="tabs" id="tabs"></div>
+  <p class="lead">미션을 마친 뒤 칸을 채웁니다. 제출 버튼은 없습니다. 입력을 멈추면 자동으로 저장되고, 언제든 다시 들어와 고칠 수 있습니다. 세 주차의 기록은 13주차 워크숍에서 다시 꺼내 씁니다.</p>
+  <div id="form"></div>
+</section>
+
+</main><footer>MIS 2026 · 10~12주차 러닝 저널</footer>
+<script src="weeks.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+const db=window.supabase.createClient('https://bwmbjfrrbeepfdfboqbg.supabase.co','sb_publishable_Ag59Uqz-yvH4AqznKHMg1g__p3sEvL0');
+const WEEKS=window.JOURNAL_WEEKS, SKEY='mis2026_journal_session';
+const $=id=>document.getElementById(id);
+const status=$('saveStatus'),label=$('saveText');
+let cred=null, journals={}, week=null, timer=null, saving=false, dirty=false, rev=0;
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function msg(el,text,isErr){el.textContent=text;el.classList.remove('hidden');el.classList.toggle('error',!!isErr)}
+function show(mode){['login','link','journal'].forEach(s=>$(s).classList.toggle('hidden',s!==mode));$('logout').classList.toggle('hidden',mode!=='journal');status.classList.toggle('hidden',mode!=='journal')}
+function setState(k,t){status.dataset.state=k;label.textContent=t}
+function hasContent(w){const r=journals[w]?.responses||{};return Object.values(r).some(v=>String(v||'').trim())}
+
+async function open(nick,pin,silent){
+  const {data,error}=await db.rpc('journal_open',{p_nickname:nick,p_pin:pin});
+  if(error||!data) return {ok:false,code:'error'};
+  if(data.ok){
+    cred={nick:data.profile.nickname,pin};
+    try{sessionStorage.setItem(SKEY,JSON.stringify(cred));localStorage.setItem('mis2026_site_nickname',data.profile.nickname);localStorage.setItem('mis2026_nickname_verified','1');localStorage.setItem('mis2026_student_identity_verified','1')}catch(e){}
+    journals=data.journals||{};
+    const p=data.profile;$('profile').textContent=p.full_name+' · '+(p.section_code||'')+'분반 · '+p.student_number+' · 닉네임 '+p.nickname;
+    show('journal');
+    const q=Number(new URLSearchParams(location.search).get('week'));
+    const openWeeks=WEEKS.filter(w=>w.open);
+    selectWeek((openWeeks.find(w=>w.week===q)||openWeeks[openWeeks.length-1]||WEEKS[0]).week);
+  }
+  return data;
+}
+
+$('openBtn').onclick=async()=>{
+  const nick=$('nick').value.trim(),pin=$('pin').value.trim(),m=$('loginMsg'),b=$('openBtn');
+  if(!nick){msg(m,'닉네임을 입력해 주세요.',true);return}
+  if(!/^[0-9]{4}$/.test(pin)){msg(m,'PIN은 숫자 4자리입니다.',true);return}
+  b.disabled=true;const r=await open(nick,pin);b.disabled=false;
+  if(r.ok)return;
+  if(r.code==='wrong_pin')msg(m,'PIN이 일치하지 않습니다. 다시 확인해 주세요.',true);
+  else if(r.code==='not_found'||r.code==='not_linked'){
+    msg(m,r.code==='not_found'?'등록되지 않은 닉네임입니다. 처음 연결하기로 이름·학번을 확인해 주세요.':'아직 실명 인증이 안 된 닉네임입니다. 이름·학번을 한 번만 확인해 주세요.',true);
+    $('lnick').value=nick;$('lpin').value=pin;setTimeout(()=>show('link'),900);
+  } else msg(m,'연결 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',true);
+};
+$('pin').addEventListener('keydown',e=>{if(e.key==='Enter')$('openBtn').click()});
+$('toLink').onclick=()=>{$('lnick').value=$('nick').value.trim();show('link')};
+$('backLogin').onclick=()=>show('login');
+
+$('linkBtn').onclick=async()=>{
+  const name=$('lname').value.trim(),no=$('lno').value.trim(),nick=$('lnick').value.trim().slice(0,30),pin=$('lpin').value.trim(),m=$('linkMsg'),b=$('linkBtn');
+  if(!name||!no||!nick){msg(m,'이름·학번·닉네임을 모두 입력해 주세요.',true);return}
+  if(!/^[0-9]{4}$/.test(pin)){msg(m,'PIN은 숫자 4자리입니다.',true);return}
+  b.disabled=true;
+  try{
+    const st=(await db.rpc('student_identity_status',{p_full_name:name,p_student_number:no})).data;
+    if(!st||!st.ok){msg(m,st&&st.code==='no_match'?'이름과 학번이 수강생 명단과 일치하지 않습니다.':'학생 정보를 확인하지 못했습니다. 다시 시도해 주세요.',true);return}
+    if(st.has_nickname){
+      if(String(st.nickname).toLowerCase()!==nick.toLowerCase()){msg(m,'이 학번에는 이미 다른 닉네임이 등록되어 있습니다. 등록한 닉네임으로 다시 입력해 주세요.',true);return}
+      const r=await open(st.nickname,pin);
+      if(!r.ok)msg(m,r.code==='wrong_pin'?'PIN이 일치하지 않습니다.':'연결하지 못했습니다. 다시 시도해 주세요.',true);
+      return;
+    }
+    const ns=(await db.rpc('site_nickname_status',{p_nickname:nick})).data;
+    if(!ns||!ns.ok){msg(m,'닉네임 상태를 확인하지 못했습니다. 다시 시도해 주세요.',true);return}
+    const fn=ns.status==='registered'?'link_student_nickname':ns.status==='legacy'?'claim_student_legacy_nickname':'claim_student_nickname';
+    const {data,error}=await db.rpc(fn,{p_full_name:name,p_student_number:no,p_nickname:nick,p_pin:pin});
+    if(error||!data||!data.ok){
+      const c=data&&data.code;
+      msg(m,c==='wrong_pin'?'이 닉네임의 PIN이 일치하지 않습니다.':(c==='taken'||c==='nickname_linked')?'이미 다른 학생에게 연결된 닉네임입니다. 다른 닉네임을 써 주세요.':c==='student_registered'?'이 학번에는 이미 닉네임이 등록되어 있습니다.':'연결하지 못했습니다. 다시 시도해 주세요.',true);return;
+    }
+    const r=await open(data.nickname||nick,pin);
+    if(!r.ok)msg(m,'연결은 되었지만 저널을 열지 못했습니다. 로그인 화면에서 다시 시도해 주세요.',true);
+  } finally {b.disabled=false}
+};
+
+function renderTabs(){
+  $('tabs').innerHTML=WEEKS.map(w=>'<button class="tab'+(w.week===week?' active':'')+'" data-w="'+w.week+'"'+(w.open?'':' disabled')+'>'+w.week+'주차'+(w.open?(hasContent(w.week)?'<span class="mark">✓ 작성</span>':''):'<span class="mark">준비 중</span>')+'</button>').join('');
+  $('tabs').querySelectorAll('.tab:not(:disabled)').forEach(t=>t.onclick=async()=>{await flush();selectWeek(Number(t.dataset.w))});
+}
+function selectWeek(w){
+  week=w;const cfg=WEEKS.find(x=>x.week===w);const r=journals[w]?.responses||{};
+  $('weekTitle').textContent=cfg.title;renderTabs();
+  $('form').innerHTML=cfg.sections.map(s=>'<section class="card"><h2>'+esc(s.title)+'</h2>'+s.fields.map(f=>'<div class="field"><label for="f_'+f.key+'">'+esc(f.label)+'</label>'+(f.type==='input'?'<input class="input" id="f_'+f.key+'" data-key="'+f.key+'" value="'+esc(r[f.key])+'">':'<textarea id="f_'+f.key+'" data-key="'+f.key+'">'+esc(r[f.key])+'</textarea>')+'</div>').join('')+'</section>').join('');
+  $('form').querySelectorAll('[data-key]').forEach(el=>{
+    el.addEventListener('input',()=>{dirty=true;rev++;setState('busy','저장 대기…');schedule()});
+    el.addEventListener('blur',()=>{if(dirty)flush()});
+  });
+  dirty=false;setState('ok',journals[w]?'저장된 기록 불러옴':'새 기록 · 입력하면 자동 저장');
+}
+function collect(){const r={};$('form').querySelectorAll('[data-key]').forEach(el=>r[el.dataset.key]=el.value);return r}
+function schedule(){clearTimeout(timer);timer=setTimeout(()=>{timer=null;save()},900)}
+async function flush(){clearTimeout(timer);timer=null;await save()}
+async function save(){
+  if(!cred||!dirty||saving)return;
+  saving=true;dirty=false;const myRev=rev,w=week,snap=collect();setState('busy','저장 중…');
+  const {data,error}=await db.rpc('journal_save',{p_nickname:cred.nick,p_pin:cred.pin,p_week:w,p_responses:snap});
+  saving=false;
+  if(error||!data||!data.ok){dirty=true;setState('error','저장 실패 · 인터넷 연결을 확인해 주세요');setTimeout(()=>{if(dirty)schedule()},4000);return}
+  journals[w]={responses:snap,updated_at:data.updated_at};
+  if(rev!==myRev){dirty=true;schedule()}else{setState('ok','저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}))}
+  renderTabs();
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&dirty)flush()});
+window.addEventListener('beforeunload',e=>{if(dirty||saving){e.preventDefault();e.returnValue=''}});
+$('logout').onclick=async()=>{await flush();if(dirty){setState('error','저장되지 않은 내용이 있어요');return}cred=null;journals={};try{sessionStorage.removeItem(SKEY)}catch(e){}$('pin').value='';show('login')};
+
+(async()=>{try{const c=JSON.parse(sessionStorage.getItem(SKEY)||'null');if(c&&c.nick&&c.pin){const r=await open(c.nick,c.pin);if(r.ok)return}}catch(e){}
+  try{$('nick').value=localStorage.getItem('mis2026_site_nickname')||''}catch(e){}show('login')})();
+})();
+</script></body></html>
