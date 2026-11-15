@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MIS 2026 · 러닝 저널 조회 (교수자)</title>
+<style>
+:root{--bg:#f3f0ea;--paper:#fffdf9;--ink:#18211d;--muted:#69716c;--line:#d9d2c7;--green:#244f43;--accent:#b44d35;--soft:#f5f2ed}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR",sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:1240px;margin:auto;padding:0 20px}
+header{background:linear-gradient(135deg,#17211d,#294238);color:#fff;border-top:6px solid var(--accent);padding:26px 0}
+.eyebrow{font-size:.76rem;letter-spacing:.14em;color:#e5b29e;font-weight:800}h1{margin:6px 0 4px;font-size:clamp(1.6rem,3.5vw,2.3rem)}.sub{color:#d8dfdb;font-size:.9rem}
+main{padding:22px 0 60px}.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 24px rgba(29,36,32,.05);margin-bottom:14px}
+.hidden{display:none!important}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input,select,button{font:inherit;font-size:15px}input,select{border:1px solid #cfc8bd;background:#fff;border-radius:10px;padding:10px 12px}
+.btn{border:0;border-radius:10px;padding:10px 14px;background:var(--green);color:#fff;font-weight:800;cursor:pointer}.btn.secondary{background:#ece7df;color:#28352f}
+.seg{display:inline-flex;border:1px solid #cfc8bd;border-radius:10px;overflow:hidden}.seg button{border:0;background:#fff;padding:10px 13px;cursor:pointer;font-weight:750;color:#3b4a43}.seg button.on{background:var(--green);color:#fff}
+.note{font-size:.86rem;color:var(--muted);line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.stat{background:var(--soft);border-radius:12px;padding:12px 14px}.stat .n{font-size:1.5rem;font-weight:850}.stat .l{font-size:.78rem;color:var(--muted)}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:14px;max-height:70vh}
+table{border-collapse:collapse;width:100%;min-width:860px;background:#fff}th,td{border-bottom:1px solid #ece6dd;padding:9px;text-align:center;font-size:.88rem}
+th{position:sticky;top:0;background:#f4f0e9;font-weight:850;z-index:1}td.l,th.l{text-align:left}tr.click{cursor:pointer}tr.click:hover{background:#fbf8f2}
+.ok{display:inline-block;min-width:44px;border-radius:999px;background:#e3efe7;color:var(--green);font-weight:850;padding:3px 8px;font-size:.8rem}.no{color:#bbb}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;margin-top:14px}
+.jc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px}.jc h3{margin:0 0 3px;font-size:1.02rem}.jc .meta{font-size:.78rem;color:var(--muted);margin-bottom:8px}
+.qa{margin:9px 0 0}.qa .q{font-size:.76rem;color:var(--muted);font-weight:750}.qa .a{white-space:pre-wrap;line-height:1.55;font-size:.92rem}
+.pill{display:inline-block;background:#eee8df;border-radius:999px;padding:4px 9px;margin:2px 5px 2px 0;font-size:.8rem}
+.detail h2{margin:0 0 6px}.wk{border-top:1px solid #ece6dd;padding-top:12px;margin-top:12px}.wk h3{margin:0 0 4px}
+.sec{font-weight:800;margin-top:12px;color:#2c4a3d}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style></head><body>
+<header><div class="wrap"><div class="eyebrow">MIS 2026 · INSTRUCTOR</div><h1>러닝 저널 조회</h1><div class="sub">10~12주차 AI 미니 미션 저널 · 학생 본인과 교수자만 볼 수 있습니다.</div></div></header>
+<main class="wrap">
+<section id="loginCard" class="card hidden">
+  <h2 style="margin-top:0">교수자 로그인</h2>
+  <p class="note">관리자 이메일로 로그인 링크를 받습니다. 참여 현황 관리자 화면에서 이미 로그인했다면 바로 열립니다.</p>
+  <div class="row"><input id="email" type="email" placeholder="ejhan@sookmyung.ac.kr" style="min-width:280px"><button class="btn" id="loginBtn">로그인 링크 받기</button></div>
+  <p class="note" id="loginStatus"></p>
+</section>
+
+<section id="app" class="hidden">
+  <div class="card">
+    <div class="row">
+      <select id="section"><option value="">전체 분반</option></select>
+      <div class="seg" id="weekSeg"></div>
+      <input id="search" placeholder="이름·학번·닉네임·내용 검색" style="flex:1;min-width:200px">
+      <label class="note"><input type="checkbox" id="onlyDone"> 작성한 학생만</label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div class="seg" id="viewSeg"><button data-v="table" class="on">목록</button><button data-v="cards">내용 펼쳐 보기</button></div>
+      <button class="btn secondary" id="refresh">새로고침</button>
+      <label class="note"><input type="checkbox" id="auto"> 30초마다 자동 새로고침</label>
+      <span class="note" id="status" style="margin-left:auto"></span>
+      <button class="btn secondary" id="logout">로그아웃</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="sTotal">-</div><div class="l">학생 수</div></div>
+      <div class="stat"><div class="n" id="sDone">-</div><div class="l">선택 주차 작성</div></div>
+      <div class="stat"><div class="n" id="sRate">-</div><div class="l">작성률</div></div>
+      <div class="stat"><div class="n" id="sLast">-</div><div class="l">마지막 저장</div></div>
+    </div>
+  </div>
+  <div id="tableView" class="tablewrap"><table><thead><tr><th class="l">이름 · 학번</th><th>분반</th><th class="l">닉네임</th><th class="l">관심 대상</th><th>10주차</th><th>11주차</th><th>12주차</th><th>마지막 저장</th></tr></thead><tbody id="tbody"></tbody></table></div>
+  <div id="cardView" class="cards hidden"></div>
+  <div id="detail" class="card detail hidden" style="margin-top:14px"></div>
+</section>
+</main>
+<script src="../journal/weeks.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const db=window.supabase.createClient('https://bwmbjfrrbeepfdfboqbg.supabase.co','sb_publishable_Ag59Uqz-yvH4AqznKHMg1g__p3sEvL0');
+const WEEKS=window.JOURNAL_WEEKS;const $=id=>document.getElementById(id);
+let roster=[],nickByStudent=new Map(),journals=new Map(),week=10,view='table',autoTimer=null;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>String(s??'').trim().toLowerCase();
+const fmt=t=>t?new Date(t).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+const filled=r=>r&&Object.values(r.responses||{}).some(v=>String(v||'').trim());
+const fieldsOf=w=>(WEEKS.find(x=>x.week===w)?.sections||[]).flatMap(s=>s.fields);
+
+$('weekSeg').innerHTML=WEEKS.map(w=>'<button data-w="'+w.week+'"'+(w.week===week?' class="on"':'')+'>'+w.week+'주차</button>').join('');
+$('weekSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;week=Number(b.dataset.w);[...$('weekSeg').children].forEach(x=>x.classList.toggle('on',x===b));render()};
+$('viewSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;view=b.dataset.v;[...$('viewSeg').children].forEach(x=>x.classList.toggle('on',x===b));render()};
+['section','search','onlyDone'].forEach(id=>$(id).addEventListener('input',render));
+$('refresh').onclick=load;
+$('auto').onchange=()=>{clearInterval(autoTimer);if($('auto').checked)autoTimer=setInterval(load,30000)};
+$('logout').onclick=async()=>{await db.auth.signOut();location.reload()};
+$('loginBtn').onclick=async()=>{const e=$('email').value.trim();if(!e)return;$('loginBtn').disabled=true;const{error}=await db.auth.signInWithOtp({email:e,options:{emailRedirectTo:location.origin+location.pathname}});$('loginBtn').disabled=false;$('loginStatus').textContent=error?'링크를 보내지 못했습니다: '+error.message:'이메일의 로그인 링크를 누르면 이 화면으로 돌아옵니다.'};
+
+async function auth(){const{data:{session}}=await db.auth.getSession();$('loginCard').classList.toggle('hidden',!!session);$('app').classList.toggle('hidden',!session);if(session)await load()}
+async function load(){
+  $('status').textContent='불러오는 중…';
+  const [r1,r2,r3]=await Promise.all([
+    db.from('student_roster').select('id,student_number,full_name,major,section_code').order('section_code').order('full_name'),
+    db.from('site_nickname_registry').select('nickname,student_id'),
+    db.from('student_journals').select('student_id,week_number,responses,updated_at')
+  ]);
+  if(r1.error||r3.error){$('status').textContent='권한이 없거나 불러오지 못했습니다. 관리자 이메일로 로그인했는지 확인해 주세요.';return}
+  roster=r1.data||[];nickByStudent=new Map((r2.data||[]).filter(x=>x.student_id!=null).map(x=>[x.student_id,x.nickname]));
+  journals=new Map();(r3.data||[]).forEach(j=>journals.set(j.student_id+':'+j.week_number,j));
+  const secs=[...new Set(roster.map(s=>s.section_code).filter(Boolean))].sort();
+  const cur=$('section').value;$('section').innerHTML='<option value="">전체 분반</option>'+secs.map(s=>'<option'+(s===cur?' selected':'')+'>'+esc(s)+'</option>').join('');
+  $('status').textContent='갱신 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  render();
+}
+function rows(){
+  const sec=$('section').value,q=norm($('search').value),only=$('onlyDone').checked;
+  return roster.filter(s=>{
+    if(sec&&s.section_code!==sec)return false;
+    const j=journals.get(s.id+':'+week);
+    if(only&&!filled(j))return false;
+    if(!q)return true;
+    const hay=[s.full_name,s.student_number,nickByStudent.get(s.id),...Object.values(j?.responses||{})].map(norm).join(' ');
+    return hay.includes(q);
+  });
+}
+function render(){
+  const list=rows();const done=list.filter(s=>filled(journals.get(s.id+':'+week)));
+  const last=done.map(s=>journals.get(s.id+':'+week).updated_at).sort().pop();
+  $('sTotal').textContent=list.length;$('sDone').textContent=done.length;$('sRate').textContent=list.length?Math.round(done.length/list.length*100)+'%':'-';$('sLast').textContent=last?fmt(last):'-';
+  $('tableView').classList.toggle('hidden',view!=='table');$('cardView').classList.toggle('hidden',view!=='cards');
+  if(view==='table'){
+    $('tbody').innerHTML=list.map(s=>{
+      const cell=w=>{const j=journals.get(s.id+':'+w);if(!filled(j))return'<td><span class="no">–</span></td>';const n=Object.values(j.responses).join('').replace(/\s/g,'').length;return'<td><span class="ok">'+n+'자</span></td>'};
+      const lastAny=[10,11,12].map(w=>journals.get(s.id+':'+w)?.updated_at).filter(Boolean).sort().pop();
+      const interest=journals.get(s.id+':10')?.responses?.interest||'';
+      return '<tr class="click" data-id="'+s.id+'"><td class="l"><strong>'+esc(s.full_name)+'</strong> <span class="note">'+esc(s.student_number)+'</span></td><td>'+esc(s.section_code||'-')+'</td><td class="l">'+esc(nickByStudent.get(s.id)||'')+'</td><td class="l">'+esc(interest)+'</td>'+cell(10)+cell(11)+cell(12)+'<td class="note">'+fmt(lastAny)+'</td></tr>';
+    }).join('')||'<tr><td colspan="8" class="note">조건에 맞는 학생이 없습니다.</td></tr>';
+    $('tbody').querySelectorAll('tr[data-id]').forEach(tr=>tr.onclick=()=>detail(Number(tr.dataset.id)));
+  } else {
+    const fields=fieldsOf(week);
+    $('cardView').innerHTML=done.map(s=>{const r=journals.get(s.id+':'+week).responses;
+      return '<div class="jc"><h3>'+esc(s.full_name)+'</h3><div class="meta">'+esc(s.section_code||'')+'분반 · '+esc(s.student_number)+' · '+esc(nickByStudent.get(s.id)||'')+' · '+fmt(journals.get(s.id+':'+week).updated_at)+'</div>'+
+        fields.filter(f=>String(r[f.key]||'').trim()).map(f=>'<div class="qa"><div class="q">'+esc(f.label)+'</div><div class="a">'+esc(r[f.key])+'</div></div>').join('')+'</div>'}).join('')||'<p class="note">선택한 주차에 작성한 학생이 없습니다.</p>';
+  }
+}
+function detail(id){
+  const s=roster.find(x=>x.id===id);if(!s)return;
+  const body=WEEKS.map(w=>{const j=journals.get(id+':'+w.week);if(!filled(j))return'<div class="wk"><h3>'+w.week+'주차</h3><p class="note">작성한 내용이 없습니다.</p></div>';
+    return '<div class="wk"><h3>'+esc(w.title)+'</h3><div class="note">마지막 저장 '+fmt(j.updated_at)+'</div>'+w.sections.map(sec=>'<div class="sec">'+esc(sec.title)+'</div>'+sec.fields.map(f=>'<div class="qa"><div class="q">'+esc(f.label)+'</div><div class="a">'+(esc(j.responses[f.key])||'<span class="no">–</span>')+'</div></div>').join('')).join('')+'</div>'}).join('');
+  $('detail').innerHTML='<h2>'+esc(s.full_name)+'</h2><span class="pill">'+esc(s.section_code||'-')+'분반</span><span class="pill">학번 '+esc(s.student_number)+'</span><span class="pill">닉네임 '+esc(nickByStudent.get(id)||'미연결')+'</span>'+(s.major?'<span class="pill">'+esc(s.major)+'</span>':'')+body;
+  $('detail').classList.remove('hidden');$('detail').scrollIntoView({behavior:'smooth',block:'start'});
+}
+db.auth.onAuthStateChange(()=>setTimeout(auth,0));auth();
+</script></body></html>
