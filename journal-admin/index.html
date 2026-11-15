@@ -45,7 +45,7 @@ th{position:sticky;top:0;background:#f4f0e9;font-weight:850;z-index:1}td.l,th.l{
     </div>
     <div class="row" style="margin-top:10px">
       <div class="seg" id="viewSeg"><button data-v="table" class="on">목록</button><button data-v="cards">내용 펼쳐 보기</button></div>
-      <button class="btn secondary" id="refresh">새로고침</button>
+      <button class="btn secondary" id="refresh">새로고침</button><button class="btn" id="csv">전체 내려받기 (CSV)</button>
       <label class="note"><input type="checkbox" id="auto"> 30초마다 자동 새로고침</label>
       <span class="note" id="status" style="margin-left:auto"></span>
       <button class="btn secondary" id="logout">로그아웃</button>
@@ -89,7 +89,7 @@ async function load(){
   const [r1,r2,r3]=await Promise.all([
     db.from('student_roster').select('id,student_number,full_name,major,section_code').order('section_code').order('full_name'),
     db.from('site_nickname_registry').select('nickname,student_id'),
-    db.from('student_journals').select('student_id,week_number,responses,updated_at')
+    db.from('student_journals').select('student_id,week_number,responses,updated_at,full_name,student_number,section_code')
   ]);
   if(r1.error||r3.error){$('status').textContent='권한이 없거나 불러오지 못했습니다. 관리자 이메일로 로그인했는지 확인해 주세요.';return}
   roster=r1.data||[];nickByStudent=new Map((r2.data||[]).filter(x=>x.student_id!=null).map(x=>[x.student_id,x.nickname]));
@@ -137,5 +137,26 @@ function detail(id){
   $('detail').innerHTML='<h2>'+esc(s.full_name)+'</h2><span class="pill">'+esc(s.section_code||'-')+'분반</span><span class="pill">학번 '+esc(s.student_number)+'</span><span class="pill">닉네임 '+esc(nickByStudent.get(id)||'미연결')+'</span>'+(s.major?'<span class="pill">'+esc(s.major)+'</span>':'')+body;
   $('detail').classList.remove('hidden');$('detail').scrollIntoView({behavior:'smooth',block:'start'});
 }
+function exportCsv(){
+  const weeks=WEEKS.filter(w=>w.sections.length);
+  const q=v=>{v=String(v??'');return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  const head=['분반','이름','학번','닉네임'];
+  weeks.forEach(w=>{fieldsOf(w.week).forEach(f=>head.push(w.week+'주차 · '+f.label));head.push(w.week+'주차 · 마지막 저장')});
+  const people=roster.map(s=>({id:s.id,section:s.section_code,name:s.full_name,no:s.student_number}));
+  const known=new Set(roster.map(s=>s.id));
+  journals.forEach(j=>{if(!known.has(j.student_id)){known.add(j.student_id);people.push({id:j.student_id,section:j.section_code,name:(j.full_name||'')+' (명단에 없음)',no:j.student_number})}});
+  const lines=[head.map(q).join(',')];
+  people.forEach(p=>{
+    const row=[p.section||'',p.name||'',p.no||'',nickByStudent.get(p.id)||''];
+    weeks.forEach(w=>{const j=journals.get(p.id+':'+w.week);fieldsOf(w.week).forEach(f=>row.push(j?.responses?.[f.key]||''));row.push(j?fmt(j.updated_at):'')});
+    lines.push(row.map(q).join(','));
+  });
+  const d=new Date(),pad=n=>String(n).padStart(2,'0');
+  const name='MIS_러닝저널_'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'_'+pad(d.getHours())+pad(d.getMinutes())+'.csv';
+  const blob=new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  $('status').textContent='내려받음 · '+name;
+}
+$('csv').onclick=exportCsv;
 db.auth.onAuthStateChange(()=>setTimeout(auth,0));auth();
 </script></body></html>
