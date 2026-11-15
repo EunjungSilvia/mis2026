@@ -101,9 +101,9 @@ footer{color:#78847a;text-align:center;padding:25px 12px;font-size:.8rem}
    if(error){m.textContent='로그인 링크를 보내지 못했습니다: '+error.message;m.classList.add('error')}
    else m.textContent='이메일로 로그인 링크를 보냈습니다. 받은 편지함에서 링크를 열어 주세요.';
  };
- logout.onclick=async()=>{if(timer){clearTimeout(timer);timer=null}if(dirty)await save();if(dirty){alert('저장되지 않은 내용이 있습니다. 연결을 확인하고 다시 시도해 주세요.');return}await db.auth.signOut();user=null;show(false)};
+ logout.onclick=async()=>{if(timer){clearTimeout(timer);timer=null}if(dirty)await save();if(dirty){alert('저장되지 않은 내용이 있습니다. 연결을 확인하고 다시 시도해 주세요.');return}await db.auth.signOut();user=null;show('login')};
  async function boot(){const {data:{user:u}}=await db.auth.getUser();user=u;if(u){await verifiedEntry()}else show('login')}
- db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){user=null;show(false)}});
+ db.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){user=null;show('login')}});
  boot().catch(()=>{document.getElementById('loginMessage').textContent='연결 오류가 발생했습니다. 새로고침해 주세요.';document.getElementById('loginMessage').classList.remove('hidden')});
 })();
 </script></body></html>
