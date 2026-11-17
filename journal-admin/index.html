@@ -24,6 +24,14 @@ th{position:sticky;top:0;background:#f4f0e9;font-weight:850;z-index:1}td.l,th.l{
 .pill{display:inline-block;background:#eee8df;border-radius:999px;padding:4px 9px;margin:2px 5px 2px 0;font-size:.8rem}
 .detail h2{margin:0 0 6px}.wk{border-top:1px solid #ece6dd;padding-top:12px;margin-top:12px}.wk h3{margin:0 0 4px}
 .sec{font-weight:800;margin-top:12px;color:#2c4a3d}
+.paper{max-width:860px;margin:22px 0 8px;padding-top:18px;border-top:1px solid #ece6dd}.kicker{color:#2563b8;font-weight:800;font-size:.88rem;margin-bottom:4px}.ptitle{font-size:1.6rem;font-weight:850;margin:0 0 10px}
+.pmeta{display:flex;gap:14px;flex-wrap:wrap;font-size:.9rem;background:#f7f6f2;border:1px solid #e3e1da;border-radius:8px;padding:8px 12px;margin-bottom:10px}
+.sh{font-size:1rem;margin:18px 0 6px}
+table.sheet{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;margin-bottom:4px;background:#fff}
+.sheet th,.sheet td{border:1px solid #9a9ea6;vertical-align:middle;padding:0;text-align:left;font-size:.9rem;position:static}
+.sheet th{background:#efeee9;font-weight:700;padding:8px 10px;line-height:1.45}
+.sheet.kv th{width:33%}.sheet.grid thead th:first-child,.sheet .rl{width:23%}
+.pval{white-space:pre-wrap;word-break:break-word;padding:8px 10px;line-height:1.55;min-height:36px}.pval.tall{min-height:80px}
 @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
 </style></head><body>
 <header><div class="wrap"><div class="eyebrow">MIS 2026 · INSTRUCTOR</div><h1>러닝 저널 조회</h1><div class="sub">10~12주차 AI 미니 미션 저널 · 학생 본인과 교수자만 볼 수 있습니다.</div></div></header>
@@ -130,12 +138,32 @@ function render(){
         fields.filter(f=>String(r[f.key]||'').trim()).map(f=>'<div class="qa"><div class="q">'+esc(f.label)+'</div><div class="a">'+esc(r[f.key])+'</div></div>').join('')+'</div>'}).join('')||'<p class="note">선택한 주차에 작성한 학생이 없습니다.</p>';
   }
 }
+function sheetView(s,w,j){
+  const r=j?.responses||{};
+  const pv=(v,tall)=>'<div class="pval'+(tall?' tall':'')+'">'+(String(v||'').trim()?esc(v):'<span class="no">–</span>')+'</div>';
+  const secs=w.sections.map(sec=>{
+    let h=sec.title?'<h4 class="sh">'+esc(sec.title)+'</h4>':'';
+    if(sec.layout==='grid'){
+      h+='<table class="sheet grid"><thead><tr>'+sec.cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+
+        sec.rows.map(row=>'<tr><th class="rl">'+esc(row.label)+'</th>'+row.keys.map(k=>'<td>'+pv(r[k],true)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+    } else if(sec.layout==='block'){
+      h+='<table class="sheet"><tbody>'+sec.fields.map(f=>'<tr><th>'+esc(f.label)+'</th></tr><tr><td>'+pv(r[f.key],true)+'</td></tr>').join('')+'</tbody></table>';
+    } else {
+      h+='<table class="sheet kv"><tbody>'+sec.fields.map(f=>'<tr><th>'+esc(f.label)+'</th><td>'+pv(r[f.key],sec.tall)+'</td></tr>').join('')+'</tbody></table>';
+    }
+    return h;
+  }).join('');
+  return '<div class="paper"><div class="kicker">경영정보시스템 · '+w.week+'주차</div><div class="ptitle">'+esc(w.sheetTitle||'러닝 저널')+'</div>'+
+    '<div class="pmeta"><span>작성자 <strong>'+esc(s.full_name)+'</strong></span><span>학번 '+esc(s.student_number)+'</span><span>'+esc(s.section_code||'')+'분반</span>'+(j?'<span style="margin-left:auto">마지막 저장 '+fmt(j.updated_at)+'</span>':'')+'</div>'+
+    (filled(j)?secs:'<p class="note">아직 작성한 내용이 없습니다.</p>')+'</div>';
+}
 function detail(id){
   const s=roster.find(x=>x.id===id);if(!s)return;
-  const body=WEEKS.map(w=>{const j=journals.get(id+':'+w.week);if(!filled(j))return'<div class="wk"><h3>'+w.week+'주차</h3><p class="note">작성한 내용이 없습니다.</p></div>';
-    return '<div class="wk"><h3>'+esc(w.title)+'</h3><div class="note">마지막 저장 '+fmt(j.updated_at)+'</div>'+w.sections.map(sec=>'<div class="sec">'+esc(sec.title)+'</div>'+sec.fields.map(f=>'<div class="qa"><div class="q">'+esc(f.label)+'</div><div class="a">'+(esc(j.responses[f.key])||'<span class="no">–</span>')+'</div></div>').join('')).join('')+'</div>'}).join('');
-  $('detail').innerHTML='<h2>'+esc(s.full_name)+'</h2><span class="pill">'+esc(s.section_code||'-')+'분반</span><span class="pill">학번 '+esc(s.student_number)+'</span><span class="pill">닉네임 '+esc(nickByStudent.get(id)||'미연결')+'</span>'+(s.major?'<span class="pill">'+esc(s.major)+'</span>':'')+body;
-  $('detail').classList.remove('hidden');$('detail').scrollIntoView({behavior:'smooth',block:'start'});
+  const weeks=WEEKS.filter(w=>w.sections.length);
+  $('detail').innerHTML='<div class="row" style="justify-content:space-between"><h2 style="margin:0">'+esc(s.full_name)+' <span class="note">'+esc(s.student_number)+' · '+esc(s.section_code||'-')+'분반 · 닉네임 '+esc(nickByStudent.get(id)||'미연결')+(s.major?' · '+esc(s.major):'')+'</span></h2><button class="btn secondary" id="closeDetail">닫기</button></div>'+
+    (weeks.length?weeks.map(w=>sheetView(s,w,journals.get(id+':'+w.week))).join(''):'<p class="note">열린 주차가 없습니다.</p>');
+  $('detail').classList.remove('hidden');$('closeDetail').onclick=()=>$('detail').classList.add('hidden');
+  $('detail').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function exportCsv(){
   const weeks=WEEKS.filter(w=>w.sections.length);
