@@ -77,6 +77,7 @@ table.sheet{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom
     <div class="field"><label for="pin">PIN (숫자 4자리)</label><input id="pin" class="input" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password"></div>
     <button id="openBtn" class="primary">들어가기</button>
     <p class="hint">닉네임을 만든 적이 없거나 실명 인증을 하지 않았다면 <button class="linkbtn" id="toLink">처음 연결하기</button>를 눌러 주세요.</p>
+    <p class="hint">PIN을 잊었다면 교수님께 PIN 재설정을 요청한 뒤 <button class="linkbtn" id="toReset">PIN 다시 정하기</button>를 눌러 주세요.</p>
     <p id="loginMsg" class="notice hidden" role="status"></p>
   </section>
 
@@ -90,6 +91,19 @@ table.sheet{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom
     <div class="field"><label for="lpin">PIN (숫자 4자리)</label><input id="lpin" class="input" type="password" inputmode="numeric" maxlength="4"><p class="hint">새 닉네임이면 지금 정한 숫자 4자리가 PIN이 됩니다.</p></div>
     <button id="linkBtn" class="primary">확인하고 들어가기</button> <button class="linkbtn" id="backLogin" style="margin-left:12px">돌아가기</button>
     <p id="linkMsg" class="notice hidden" role="status"></p>
+  </section>
+
+  <!-- PIN 다시 정하기 -->
+  <section id="reset" class="account hidden">
+    <div class="eyebrow">RESET PIN · PIN 다시 정하기</div><h1>PIN 다시 정하기</h1>
+    <p class="lead">교수님이 PIN 재설정을 허용한 뒤 24시간 안에 한 번 쓸 수 있습니다. 이름·학번·닉네임을 확인하고 새 PIN을 정하세요.</p>
+    <div class="field"><label for="rname">이름</label><input id="rname" class="input" maxlength="100" autocomplete="name"></div>
+    <div class="field"><label for="rno">학번</label><input id="rno" class="input" inputmode="numeric" maxlength="40"></div>
+    <div class="field"><label for="rnick">닉네임</label><input id="rnick" class="input" maxlength="30"></div>
+    <div class="field"><label for="rpin">새 PIN (숫자 4자리)</label><input id="rpin" class="input" type="password" inputmode="numeric" maxlength="4"></div>
+    <div class="field"><label for="rpin2">새 PIN 확인</label><input id="rpin2" class="input" type="password" inputmode="numeric" maxlength="4"></div>
+    <button id="resetBtn" class="primary">새 PIN 저장하고 들어가기</button> <button class="linkbtn" id="backLogin2" style="margin-left:12px">돌아가기</button>
+    <p id="resetMsg" class="notice hidden" role="status"></p>
   </section>
 
   <!-- 워크스페이스 -->
@@ -124,7 +138,7 @@ const PAGES=[
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function msg(el,text,isErr){el.textContent=text;el.classList.remove('hidden');el.classList.toggle('error',!!isErr)}
-function show(mode){['login','link','workspace'].forEach(s=>$(s).classList.toggle('hidden',s!==mode))}
+function show(mode){['login','link','reset','workspace'].forEach(s=>$(s).classList.toggle('hidden',s!==mode))}
 function setState(k,t){status.dataset.state=k;label.textContent=t}
 function hasContent(w){const r=journals[w]?.responses||{};return Object.values(r).some(v=>String(v||'').trim())}
 
@@ -160,6 +174,22 @@ $('pin').addEventListener('keydown',e=>{if(e.key==='Enter')$('openBtn').click()}
 $('toLink').onclick=()=>{$('lnick').value=$('nick').value.trim();show('link')};
 $('backLogin').onclick=()=>show('login');
 
+$('toReset').onclick=()=>{$('rnick').value=$('nick').value.trim();show('reset')};
+$('backLogin2').onclick=()=>show('login');
+$('resetBtn').onclick=async()=>{
+  const name=$('rname').value.trim(),no=$('rno').value.trim(),nick=$('rnick').value.trim(),pin=$('rpin').value.trim(),pin2=$('rpin2').value.trim(),m=$('resetMsg'),b=$('resetBtn');
+  if(!name||!no||!nick){msg(m,'이름·학번·닉네임을 모두 입력해 주세요.',true);return}
+  if(!/^[0-9]{4}$/.test(pin)){msg(m,'새 PIN은 숫자 4자리입니다.',true);return}
+  if(pin!==pin2){msg(m,'새 PIN과 확인 PIN이 다릅니다.',true);return}
+  b.disabled=true;
+  try{
+    const {data,error}=await db.rpc('journal_reset_pin',{p_full_name:name,p_student_number:no,p_nickname:nick,p_new_pin:pin});
+    if(error||!data){msg(m,'연결 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',true);return}
+    if(!data.ok){msg(m,data.code==='no_match'?'이름과 학번이 수강생 명단과 일치하지 않습니다.':data.code==='nickname_mismatch'?'이 학생에게 등록된 닉네임과 다릅니다. 닉네임을 다시 확인해 주세요.':data.code==='not_allowed'?'PIN 재설정이 허용되지 않았거나 시간이 지났습니다. 교수님께 다시 요청해 주세요.':'PIN을 바꾸지 못했습니다. 다시 시도해 주세요.',true);return}
+    const r=await open(data.nickname,pin);
+    if(!r.ok)msg(m,'새 PIN이 저장되었습니다. 로그인 화면에서 새 PIN으로 들어가 주세요.',false);
+  } finally {b.disabled=false}
+};
 $('linkBtn').onclick=async()=>{
   const name=$('lname').value.trim(),no=$('lno').value.trim(),nick=$('lnick').value.trim().slice(0,30),pin=$('lpin').value.trim(),m=$('linkMsg'),b=$('linkBtn');
   if(!name||!no||!nick){msg(m,'이름·학번·닉네임을 모두 입력해 주세요.',true);return}
