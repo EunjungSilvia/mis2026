@@ -160,9 +160,16 @@ function sheetView(s,w,j){
 function detail(id){
   const s=roster.find(x=>x.id===id);if(!s)return;
   const weeks=WEEKS.filter(w=>w.sections.length);
-  $('detail').innerHTML='<div class="row" style="justify-content:space-between"><h2 style="margin:0">'+esc(s.full_name)+' <span class="note">'+esc(s.student_number)+' · '+esc(s.section_code||'-')+'분반 · 닉네임 '+esc(nickByStudent.get(id)||'미연결')+(s.major?' · '+esc(s.major):'')+'</span></h2><button class="btn secondary" id="closeDetail">닫기</button></div>'+
+  $('detail').innerHTML='<div class="row" style="justify-content:space-between"><h2 style="margin:0">'+esc(s.full_name)+' <span class="note">'+esc(s.student_number)+' · '+esc(s.section_code||'-')+'분반 · 닉네임 '+esc(nickByStudent.get(id)||'미연결')+(s.major?' · '+esc(s.major):'')+'</span></h2><span class="row"><span class="note" id="pinMsg"></span><button class="btn secondary" id="pinReset">PIN 재설정 허용</button><button class="btn secondary" id="closeDetail">닫기</button></span></div>'+
     (weeks.length?weeks.map(w=>sheetView(s,w,journals.get(id+':'+w.week))).join(''):'<p class="note">열린 주차가 없습니다.</p>');
   $('detail').classList.remove('hidden');$('closeDetail').onclick=()=>$('detail').classList.add('hidden');
+  $('pinReset').onclick=async()=>{
+    if(!nickByStudent.get(id)){$('pinMsg').textContent='닉네임이 연결되지 않은 학생입니다.';return}
+    $('pinReset').disabled=true;
+    const {data,error}=await db.rpc('admin_allow_pin_reset',{p_student_id:id});
+    $('pinReset').disabled=false;
+    $('pinMsg').textContent=(error||!data||!data.ok)?'허용하지 못했습니다. 다시 로그인해 보세요.':'재설정 허용됨 · '+fmt(data.expires_at)+'까지 학생이 "PIN 다시 정하기"로 새 PIN을 정할 수 있어요.';
+  };
   $('detail').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function exportCsv(){
