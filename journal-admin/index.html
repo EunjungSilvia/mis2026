@@ -91,6 +91,10 @@ $('auto').onchange=()=>{clearInterval(autoTimer);if($('auto').checked)autoTimer=
 $('logout').onclick=async()=>{await db.auth.signOut();location.reload()};
 $('loginBtn').onclick=async()=>{const e=$('email').value.trim();if(!e)return;$('loginBtn').disabled=true;const{error}=await db.auth.signInWithOtp({email:e,options:{emailRedirectTo:location.origin+location.pathname}});$('loginBtn').disabled=false;$('loginStatus').textContent=error?'링크를 보내지 못했습니다: '+error.message:'이메일의 로그인 링크를 누르면 이 화면으로 돌아옵니다.'};
 
+let pinGrants=new Map();
+async function loadGrants(){const {data,error}=await db.from('pin_reset_grants').select('student_id,granted_at,expires_at,used_at');pinGrants=new Map((error?[]:data||[]).map(g=>[String(g.student_id),g]));}
+function grantState(sid){const g=pinGrants.get(String(sid));if(!g)return null;const f=t=>new Date(t).toLocaleString('ko-KR');if(g.used_at)return {k:'used',t:'PIN 재설정 완료 · 학생이 '+f(g.used_at)+'에 새 PIN으로 바꿨어요.'};if(new Date(g.expires_at)<new Date())return {k:'expired',t:'PIN 재설정 허용이 만료됐어요('+f(g.expires_at)+'). 필요하면 다시 허용해 주세요.'};return {k:'pending',t:'재설정 허용됨 · '+f(g.expires_at)+'까지 · 학생이 아직 새 PIN을 정하지 않았어요.'};}
+function pinBadge(sid){const st=grantState(sid);return st&&st.k==='pending'?' <span style="display:inline-block;border-radius:999px;background:#fdf0dc;color:#8a5a00;font-weight:800;padding:2px 8px;font-size:.75rem">PIN 재설정 대기</span>':'';}
 async function auth(){const{data:{session}}=await db.auth.getSession();$('loginCard').classList.toggle('hidden',!!session);$('app').classList.toggle('hidden',!session);if(session)await load()}
 async function load(){
   $('status').textContent='불러오는 중…';
@@ -102,6 +106,7 @@ async function load(){
   if(r1.error||r3.error){$('status').textContent='권한이 없거나 불러오지 못했습니다. 관리자 이메일로 로그인했는지 확인해 주세요.';return}
   roster=r1.data||[];nickByStudent=new Map((r2.data||[]).filter(x=>x.student_id!=null).map(x=>[x.student_id,x.nickname]));
   journals=new Map();(r3.data||[]).forEach(j=>journals.set(j.student_id+':'+j.week_number,j));
+  await loadGrants();
   const secs=[...new Set(roster.map(s=>s.section_code).filter(Boolean))].sort();
   const cur=$('section').value;$('section').innerHTML='<option value="">전체 분반</option>'+secs.map(s=>'<option'+(s===cur?' selected':'')+'>'+esc(s)+'</option>').join('');
   $('status').textContent='갱신 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
@@ -128,7 +133,7 @@ function render(){
       const cell=w=>{const j=journals.get(s.id+':'+w);if(!filled(j))return'<td><span class="no">–</span></td>';const n=Object.values(j.responses).join('').replace(/\s/g,'').length;return'<td><span class="ok">'+n+'자</span></td>'};
       const lastAny=[10,11,12].map(w=>journals.get(s.id+':'+w)?.updated_at).filter(Boolean).sort().pop();
       const interest=journals.get(s.id+':10')?.responses?.interest||'';
-      return '<tr class="click" data-id="'+s.id+'"><td class="l"><strong>'+esc(s.full_name)+'</strong> <span class="note">'+esc(s.student_number)+'</span></td><td>'+esc(s.section_code||'-')+'</td><td class="l">'+esc(nickByStudent.get(s.id)||'')+'</td><td class="l">'+esc(interest)+'</td>'+cell(10)+cell(11)+cell(12)+'<td class="note">'+fmt(lastAny)+'</td></tr>';
+      return '<tr class="click" data-id="'+s.id+'"><td class="l"><strong>'+esc(s.full_name)+'</strong>'+pinBadge(s.id)+' <span class="note">'+esc(s.student_number)+'</span></td><td>'+esc(s.section_code||'-')+'</td><td class="l">'+esc(nickByStudent.get(s.id)||'')+'</td><td class="l">'+esc(interest)+'</td>'+cell(10)+cell(11)+cell(12)+'<td class="note">'+fmt(lastAny)+'</td></tr>';
     }).join('')||'<tr><td colspan="8" class="note">조건에 맞는 학생이 없습니다.</td></tr>';
     $('tbody').querySelectorAll('tr[data-id]').forEach(tr=>tr.onclick=()=>detail(Number(tr.dataset.id)));
   } else {
@@ -160,7 +165,7 @@ function sheetView(s,w,j){
 function detail(id){
   const s=roster.find(x=>x.id===id);if(!s)return;
   const weeks=WEEKS.filter(w=>w.sections.length);
-  $('detail').innerHTML='<div class="row" style="justify-content:space-between"><h2 style="margin:0">'+esc(s.full_name)+' <span class="note">'+esc(s.student_number)+' · '+esc(s.section_code||'-')+'분반 · 닉네임 '+esc(nickByStudent.get(id)||'미연결')+(s.major?' · '+esc(s.major):'')+'</span></h2><span class="row"><span class="note" id="pinMsg"></span><button class="btn secondary" id="pinReset">PIN 재설정 허용</button><button class="btn secondary" id="closeDetail">닫기</button></span></div>'+
+  $('detail').innerHTML='<div class="row" style="justify-content:space-between"><h2 style="margin:0">'+esc(s.full_name)+' <span class="note">'+esc(s.student_number)+' · '+esc(s.section_code||'-')+'분반 · 닉네임 '+esc(nickByStudent.get(id)||'미연결')+(s.major?' · '+esc(s.major):'')+'</span></h2><span class="row"><span class="note" id="pinMsg">'+esc(grantState(id)?.t||'')+'</span><button class="btn secondary" id="pinReset">PIN 재설정 허용</button><button class="btn secondary" id="closeDetail">닫기</button></span></div>'+
     (weeks.length?weeks.map(w=>sheetView(s,w,journals.get(id+':'+w.week))).join(''):'<p class="note">열린 주차가 없습니다.</p>');
   $('detail').classList.remove('hidden');$('closeDetail').onclick=()=>$('detail').classList.add('hidden');
   $('pinReset').onclick=async()=>{
@@ -168,7 +173,8 @@ function detail(id){
     $('pinReset').disabled=true;
     const {data,error}=await db.rpc('admin_allow_pin_reset',{p_student_id:id});
     $('pinReset').disabled=false;
-    $('pinMsg').textContent=(error||!data||!data.ok)?'허용하지 못했습니다. 다시 로그인해 보세요.':'재설정 허용됨 · '+fmt(data.expires_at)+'까지 학생이 "PIN 다시 정하기"로 새 PIN을 정할 수 있어요.';
+    await loadGrants();render();
+    $('pinMsg').textContent=(error||!data||!data.ok)?'허용하지 못했습니다. 다시 로그인해 보세요.':(grantState(id)?.t||'재설정 허용됨');
   };
   $('detail').scrollIntoView({behavior:'smooth',block:'start'});
 }
