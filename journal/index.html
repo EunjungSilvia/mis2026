@@ -242,7 +242,7 @@ function cell(key,val,tall){return '<textarea class="cellin'+(tall?' tall':'')+'
 function renderWeek(w){
   const cfg=WEEKS.find(x=>x.week===w);const r=journals[w]?.responses||{};
   const secs=cfg.sections.map(s=>{
-    let h=s.title?'<h3 class="sh">'+esc(s.title)+'</h3>':'';
+    let h=(s.title?'<h3 class="sh">'+esc(s.title)+'</h3>':'')+(s.note?'<p class="hint" style="margin:-2px 0 8px;color:#5b6168">'+esc(s.note)+'</p>':'');
     if(s.layout==='grid'){
       h+='<table class="sheet grid"><thead><tr>'+s.cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+
         s.rows.map(row=>'<tr><th class="rl">'+esc(row.label)+'</th>'+row.keys.map((k,i)=>'<td data-l="'+esc(s.cols[i+1]||'')+'">'+cell(k,r[k],true)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
@@ -255,7 +255,7 @@ function renderWeek(w){
   }).join('');
   $('content').innerHTML='<div class="paper"><button class="btn-ghost pdfbtn" id="pdfBtn">PDF로 저장</button><div class="kicker">경영정보시스템 · '+w+'주차</div><h1 class="ptitle">'+esc(cfg.sheetTitle||'러닝 저널')+'</h1>'+
     '<div class="pmeta"><span>작성자 <strong>'+esc(profile.full_name)+'</strong></span><span>학번 '+esc(profile.student_number)+'</span><span>'+esc(profile.section_code||'')+'분반</span></div>'+
-    '<p class="plead">미션을 마친 뒤 아래 칸을 채운다. 입력을 멈추면 자동으로 저장되고, 언제든 다시 들어와 고칠 수 있다.</p>'+secs+'</div>';
+    '<p class="plead">'+esc(cfg.lead||'미션을 마친 뒤 아래 칸을 채운다.')+' 입력을 멈추면 자동으로 저장되고, 언제든 다시 들어와 고칠 수 있다.</p>'+secs+'</div>';
   const fit=el=>{el.style.height='auto';el.style.height=Math.max(el.scrollHeight,el.classList.contains('tall')?110:40)+'px'};
   $('content').querySelectorAll('[data-key]').forEach(el=>{
     fit(el);
@@ -268,7 +268,7 @@ function sheetHTML(w){
   const cfg=WEEKS.find(x=>x.week===w);const r=journals[w]?.responses||{};
   const pv=(v,tall)=>'<div class="pval'+(tall?' tall':'')+'">'+esc(v)+'</div>';
   const secs=cfg.sections.map(s=>{
-    let h=s.title?'<h3 class="sh">'+esc(s.title)+'</h3>':'';
+    let h=(s.title?'<h3 class="sh">'+esc(s.title)+'</h3>':'')+(s.note?'<p class="hint" style="margin:-2px 0 8px;color:#5b6168">'+esc(s.note)+'</p>':'');
     if(s.layout==='grid'){
       h+='<table class="sheet grid"><thead><tr>'+s.cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+
         s.rows.map(row=>'<tr><th class="rl">'+esc(row.label)+'</th>'+row.keys.map(k=>'<td>'+pv(r[k],true)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
