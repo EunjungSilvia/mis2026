@@ -132,8 +132,8 @@ function render(){
     $('tbody').innerHTML=list.map(s=>{
       const cell=w=>{const j=journals.get(s.id+':'+w);if(!filled(j))return'<td><span class="no">–</span></td>';const n=Object.values(j.responses).join('').replace(/\s/g,'').length;return'<td><span class="ok">'+n+'자</span></td>'};
       const lastAny=[10,11,12].map(w=>journals.get(s.id+':'+w)?.updated_at).filter(Boolean).sort().pop();
-      const interest=journals.get(s.id+':10')?.responses?.interest||'';
-      return '<tr class="click" data-id="'+s.id+'"><td class="l"><strong>'+esc(s.full_name)+'</strong>'+pinBadge(s.id)+' <span class="note">'+esc(s.student_number)+'</span></td><td>'+esc(s.section_code||'-')+'</td><td class="l">'+esc(nickByStudent.get(s.id)||'')+'</td><td class="l">'+esc(interest)+'</td>'+cell(10)+cell(11)+cell(12)+'<td class="note">'+fmt(lastAny)+'</td></tr>';
+      const iw=v=>String(journals.get(s.id+':'+v)?.responses?.interest||'').trim();const cur=iw(week);let interest=cur?esc(cur):'';if(!cur){const pw=[12,11,10].find(v=>v!==week&&iw(v));if(pw)interest='<span class="note">'+esc(iw(pw))+' ('+pw+'주차)</span>';}
+      return '<tr class="click" data-id="'+s.id+'"><td class="l"><strong>'+esc(s.full_name)+'</strong>'+pinBadge(s.id)+' <span class="note">'+esc(s.student_number)+'</span></td><td>'+esc(s.section_code||'-')+'</td><td class="l">'+esc(nickByStudent.get(s.id)||'')+'</td><td class="l">'+interest+'</td>'+cell(10)+cell(11)+cell(12)+'<td class="note">'+fmt(lastAny)+'</td></tr>';
     }).join('')||'<tr><td colspan="8" class="note">조건에 맞는 학생이 없습니다.</td></tr>';
     $('tbody').querySelectorAll('tr[data-id]').forEach(tr=>tr.onclick=()=>detail(Number(tr.dataset.id)));
   } else {
