@@ -53,8 +53,46 @@ window.JOURNAL_WEEKS = [
   {
     week: 11,
     title: '11주차 · 그 일은 어떻게 돌아가고, AI로 어떻게 바뀌고 있나',
-    open: false,
-    sections: []
+    sheetTitle: '러닝 저널',
+    lead: '미션을 마친 뒤 수업 중에 작성한다. 칸마다 두세 문장으로, 내 말로 쓴다.',
+    open: true,
+    sections: [
+      {
+        title: '',
+        layout: 'kv',
+        fields: [
+          { key: 'interest', label: '내 관심 대상' },
+          { key: 'workflow', label: '정리한 업무 흐름 (일 한 건)' },
+          { key: 'ai', label: '사용한 AI' }
+        ]
+      },
+      {
+        title: '1. 미션에서 알게 된 것',
+        note: '미션의 정리표를 다시 보며 쓴다.',
+        layout: 'kv',
+        tall: true,
+        fields: [
+          { key: 'flow_learned', label: '업무 흐름을 정리하며 과업이나 연결 작업에 대해 새로 알게 된 것은 무엇인가?' },
+          { key: 'ai_changed', label: '내가 찾은 사례에서 AI는 업무 흐름을 바꾸었나, 누군가의 일을 대신했을 뿐인가? 그렇게 본 이유는?' }
+        ]
+      },
+      {
+        title: '2. 업무 흐름에서 나의 역할',
+        layout: 'kv',
+        tall: true,
+        fields: [
+          { key: 'human_role', label: '신입이 맡던 과업에서 AI와 일을 나눈 뒤 사람에게 남는 역할은 무엇인가?' },
+          { key: 'my_role', label: '그 가운데 내가 맡아 보고 싶은 역할, 또는 가장 중요하다고 생각하는 역할과 그 이유' }
+        ]
+      },
+      {
+        title: '3. 미션을 하며 느낀 것',
+        layout: 'block',
+        fields: [
+          { key: 'needed_skill', label: '이번 미션을 하면서 AI와 함께 일하기 위해서 필요하겠다고 느낀 능력은 무엇인가? 이유는?' }
+        ]
+      }
+    ]
   },
   {
     week: 12,
