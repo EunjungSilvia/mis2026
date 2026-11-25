@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>미션 3 수행 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday 학습 안내: 또박또박, 큰 글씨, 한 번에 한 단계
+   IDEA 지하철 노선도 — 네 정거장(저장 → 올리기 → 돌아보기 → 정리)을 한 줄로 따라가는 안내판
+   PICTURE 첫 화면의 굵은 노선과 네 역, 아래 각 역마다 실제 화면을 흉내 낸 그림
+   COLOUR 흰 바탕, 먹색, 노선 파랑 #0a5cff, 역 표시 노랑 #ffb400, 완료 초록 #00a05a
+   TYPE Noto Sans KR 900 제목 + Noto Sans KR 본문
+   LAYOUT 노트북: 제목 위, 노선 그림 전체 폭 / 휴대폰: 노선이 세로로 */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0e1116);--ink:light-dark(#111418,#eef1f5);--soft:light-dark(#5b6470,#a9b2bd);--line:#0a5cff;--amber:#ffb400;--green:#00a05a;--panel:light-dark(#f2f5fa,#171c24);--edge:light-dark(#d9dfe8,#2a3240);--chat:light-dark(#ffffff,#1d232d)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:20px}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 "Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;overflow-x:clip}
+.band{padding-block:clamp(28px,4vw,56px);padding-inline:max(5vw,16px)}
+.wrap{max-width:1100px;margin:0 auto}
+h1{font-weight:900;font-size:clamp(32px,5vw,48px);line-height:1.1;letter-spacing:-.02em;margin:6px 0 12px;text-wrap:balance}
+h2{font-weight:900;font-size:clamp(26px,3.4vw,34px);line-height:1.15;letter-spacing:-.02em;margin:0 0 10px}
+h3{font-size:19px;margin:22px 0 8px}
+p{margin:0 0 12px}
+.lead{font-size:clamp(18px,2vw,21px);max-width:44em}
+.course{font-weight:700;color:var(--line)}
+.q{display:inline-block;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:700;margin:6px 0 4px}
+.route{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:34px}
+.route::before{content:"";position:absolute;left:6%;right:6%;top:30px;height:12px;background:var(--line);border-radius:6px}
+.st{position:relative;text-align:center;text-decoration:none;color:inherit}
+.dot{width:72px;height:72px;margin:0 auto 12px;border-radius:50%;background:var(--bg);border:8px solid var(--line);display:grid;place-items:center;font-weight:900;font-size:26px;position:relative}
+.st:last-child .dot{border-color:var(--green)}
+.st b{display:block;font-size:19px;line-height:1.3}
+.st span{display:block;color:var(--soft);font-size:15px}
+.st .chip{display:inline-block;margin-top:6px;background:var(--amber);color:#111;font-size:13px;font-weight:700;border-radius:20px;padding:2px 10px}
+.st:hover b{text-decoration:underline}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:22px}
+.card h3{margin-top:0}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:10px 18px;border-radius:10px;border:0;background:var(--line);color:#fff;font:700 16px/1.2 inherit;cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.btn:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.msg{font-size:14px;color:var(--green);min-height:20px;margin-top:8px}
+pre{background:var(--ink);color:var(--bg);border-radius:10px;padding:16px;font:15px/1.6 "Noto Sans KR",monospace;white-space:pre-wrap;overflow-wrap:anywhere;margin:10px 0}
+.stephead{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.badge{flex:none;width:52px;height:52px;border-radius:50%;border:7px solid var(--line);display:grid;place-items:center;font-weight:900;font-size:20px}
+.badge.g{border-color:var(--green)}
+ol.steps{padding-left:22px;margin:0}
+ol.steps li{margin-bottom:8px}
+.note{font-size:15px;color:var(--soft)}
+.warn{border-left:6px solid var(--amber);background:var(--panel);padding:12px 16px;border-radius:8px;margin:12px 0}
+/* 그림: 크롬 확장 프로그램 화면 */
+.win{border:1px solid var(--edge);border-radius:12px;overflow:hidden;background:var(--chat);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.bar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--panel);border-bottom:1px solid var(--edge);font-size:14px}
+.bar i{width:11px;height:11px;border-radius:50%;background:var(--edge);display:inline-block}
+.addr{flex:1;background:var(--bg);border:1px solid var(--edge);border-radius:20px;padding:3px 12px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ext{width:28px;height:28px;border-radius:6px;background:#6b6b6b;color:#fff;font-weight:900;font-size:12px;display:grid;place-items:center;outline:3px solid var(--amber)}
+.body{padding:16px}
+.toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.load{border:2px solid var(--line);color:var(--line);border-radius:8px;padding:6px 10px;font-weight:700;font-size:14px;outline:3px solid var(--amber);outline-offset:2px}
+.tog{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700}
+.tog s{width:38px;height:22px;border-radius:11px;background:var(--line);position:relative;outline:3px solid var(--amber);outline-offset:2px}
+.tog s::after{content:"";position:absolute;right:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff}
+.extcard{border:1px solid var(--edge);border-radius:10px;padding:12px 14px;background:var(--bg)}
+.extcard .top{display:flex;gap:12px;align-items:flex-start}
+.extcard .ico{position:relative;width:38px;height:38px;border-radius:6px;background:#6b6b6b;color:#fff;font-weight:700;display:grid;place-items:center;flex:none}
+.extcard .ico::after{content:"";position:absolute;right:-6px;bottom:-6px;width:18px;height:18px;border-radius:50%;background:#e8543b;border:2px solid var(--bg)}
+.extcard b{font-size:15px}.extcard .ver{color:var(--soft);font-weight:400;font-size:13px;margin-left:6px}
+.extcard small{display:block;color:var(--soft);font-size:13px;line-height:1.5;margin-top:3px}
+.extcard .foot{display:flex;align-items:center;gap:8px;margin-top:12px}
+.extcard .pill{border:1px solid var(--edge);border-radius:16px;padding:3px 12px;font-size:13px;color:var(--line)}
+.extcard .mini{margin-left:auto;width:32px;height:18px;border-radius:9px;background:var(--line);position:relative}
+.extcard .mini::after{content:"";position:absolute;right:3px;top:3px;width:12px;height:12px;border-radius:50%;background:#fff}
+.exthead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.exthead h4{margin:0;font-size:17px}
+.savechat{position:relative;height:150px;padding:14px 16px;background:var(--bg)}
+.savechat .ln{height:9px;border-radius:5px;background:var(--edge);margin:0 0 9px}
+.savechat .inp{position:absolute;left:16px;right:130px;bottom:14px;height:30px;border:1px solid var(--edge);border-radius:15px;color:var(--soft);font-size:13px;padding:5px 12px}
+.savechat .e2kbtn{position:absolute;right:16px;bottom:56px;border:1px solid var(--edge);border-radius:18px;background:#fff;padding:6px 14px;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,.12);outline:3px solid var(--amber);outline-offset:2px;color:#222}
+.savechat .call{position:absolute;right:150px;bottom:58px}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.btnrow .pill{border:1px solid var(--edge);border-radius:16px;padding:4px 12px;font-size:13px;color:var(--line)}
+.call{display:inline-block;background:var(--amber);color:#111;font-weight:900;border-radius:50%;width:24px;height:24px;text-align:center;font-size:14px;line-height:24px;margin-right:4px}
+/* 그림: 채팅 화면 */
+.chat{display:flex;flex-direction:column;gap:12px}
+.b{max-width:88%;padding:12px 14px;border-radius:14px;font-size:15.5px;line-height:1.6}
+.ai{background:var(--panel);border:1px solid var(--edge);align-self:flex-start;border-top-left-radius:4px}
+.me{background:var(--line);color:#fff;align-self:flex-end;border-top-right-radius:4px}
+.ai .pos{display:block;font-weight:700;color:var(--line);font-size:13.5px;margin-bottom:2px}
+.files{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.file{overflow-wrap:anywhere;display:flex;align-items:center;gap:8px;background:var(--chat);color:var(--ink);border:1px solid var(--edge);border-radius:10px;padding:6px 10px;font-size:13.5px}
+.file em{font-style:normal;background:var(--line);color:#fff;border-radius:5px;padding:1px 6px;font-size:12px;font-weight:700}
+.file.rec em{background:var(--green)}
+.pick{outline:3px solid var(--amber);border-radius:6px;padding:0 3px}
+.ex{display:inline-block;font-size:13px;font-weight:700;background:var(--amber);color:#111;border-radius:6px;padding:1px 8px;margin-bottom:10px}
+.sum{background:var(--chat);border:2px solid var(--green);border-radius:12px;padding:18px 20px;font-size:15.5px}
+.sum h4{margin:14px 0 2px;font-size:16px}
+.sum h4:first-child{margin-top:0}
+.sum .me5{color:var(--green);font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:15.5px}
+th,td{border-bottom:1px solid var(--edge);padding:10px 8px;text-align:left;vertical-align:top}
+th{background:var(--panel)}
+.faq details{border-bottom:1px solid var(--edge);padding:12px 0}
+.faq summary{font-weight:700;cursor:pointer;font-size:17px}
+.faq p{margin:8px 0 0}
+footer{color:var(--soft);font-size:14px}
+.priv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:8px}
+.pv{border-radius:14px;padding:18px;border:2px solid var(--edge);background:var(--bg)}
+.pv b{display:block;font-size:18px;margin-bottom:6px}
+.pv.home{border-color:var(--green)}
+.pv.ai{border-color:var(--line)}
+.pv.no{border-style:dashed}
+.pv .tag{display:inline-block;font-size:13px;font-weight:700;border-radius:6px;padding:1px 8px;margin-bottom:8px;color:#fff}
+.pv.home .tag{background:var(--green)}
+.pv.ai .tag{background:var(--line)}
+.pv.no .tag{background:var(--soft)}
+@media(max-width:760px){.priv{grid-template-columns:minmax(0,1fr)}}
+
+@media(max-width:760px){.grid2{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.route{grid-template-columns:minmax(0,1fr);gap:18px}.route::before{left:35px;right:auto;top:20px;bottom:20px;width:12px;height:auto}.st{display:grid;grid-template-columns:72px minmax(0,1fr);gap:14px;text-align:left;align-items:center}.dot{margin:0}table{font-size:14px}.b{max-width:96%}}
+@media(prefers-reduced-motion:no-preference){.st .dot{transition:transform .2s}.st:hover .dot{transform:scale(1.08)}}
+</style>
+</head>
+<body>
+
+<section class="band">
+<div class="wrap">
+  <div class="course">경영정보시스템 12주차 · AI 미니 미션 3</div>
+  <h1>AI와 함께 한 일 다시 보기<br>미션 3 수행 가이드</h1>
+  <p class="lead">AI와 함께 일한 대화를 다시 보며, <b>그 대화에서 내가 AI를 어떻게 감독했는지</b> 살펴보는 미션이에요. 아래 네 정거장만 따라가면 돼요.</p>
+  <div class="q">핵심 질문: AI와 함께 일한 나는, AI를 어떻게 감독했나?</div>
+
+  <nav class="route" aria-label="미션 3 진행 순서">
+    <a class="st" href="#step1"><div class="dot">1</div><div><b>대화 저장하기</b><span>「E2K 대화 저장」으로 돌아볼 대화를 파일로</span><span class="chip">처음 한 번 설치 5분</span></div></a>
+    <a class="st" href="#step2"><div class="dot">2</div><div><b>파일 두 개 올리기</b><span>내가 쓰는 AI 새 대화에 지시문 + 대화 기록</span><span class="chip">1분</span></div></a>
+    <a class="st" href="#step3"><div class="dot">3</div><div><b>AI와 장면 돌아보기</b><span>두 장면을 고르고 질문에 답하기</span><span class="chip">10~15분</span></div></a>
+    <a class="st" href="#step4"><div class="dot">4</div><div><b>정리 파일 받기</b><span>보관했다가 11/30 러닝 저널에 활용</span><span class="chip">끝</span></div></a>
+  </nav>
+</div>
+</section>
+
+<section class="band" style="background:var(--panel)">
+<div class="wrap">
+  <h2>어떤 대화를 돌아볼까요?</h2>
+  <div class="grid2">
+    <div class="card" style="background:var(--bg);border:2px solid var(--line)">
+      <h3>기본: 미션 1·2 대화 (10·11주차)</h3>
+      <p>관심 분야의 일과 업무 흐름을 AI와 함께 탐색한 대화예요. 미션 1·2에서는 다른 사람의 일을 봤다면, 이번에는 그 일을 탐색하던 <b>나</b>를 봐요.</p>
+    </div>
+    <div class="card" style="background:var(--bg)">
+      <h3>미션 대화가 적당하지 않다면: 과제·프로젝트 대화</h3>
+      <p>미션 1·2 대화가 남아 있지 않거나 너무 짧아 돌아볼 장면이 적다면, 보고서·발표·조별 과제·개인 프로젝트를 하며 AI와 나눈 대화를 써도 돼요. 실제로 무언가를 만들거나 정하던 대화라면 내가 AI와 어떻게 일하는지도 잘 보여요.</p>
+    </div>
+  </div>
+  <p class="note" style="margin-top:14px">대화 1~2개를 골라요. 주고받은 말이 열 번 이상 오간 대화가 장면을 찾기 좋아요. 보여 주기 싫은 부분과 다른 사람의 개인정보는 빼고 올려요.</p>
+</div>
+</section>
+
+<section class="band">
+<div class="wrap">
+  <h2>내 대화 기록은 나만 봐요</h2>
+  <p class="lead">이 미션은 처음부터 끝까지 <b>내 컴퓨터와 내가 쓰는 AI 안에서만</b> 진행돼요. 대화 기록이 교수자나 다른 학생에게 공개되거나 자동으로 보내지지 않아요.</p>
+  <div class="priv">
+    <div class="pv home"><span class="tag">내 컴퓨터</span><b>저장은 내 폴더에</b><p>「E2K 대화 저장」은 대화를 내 컴퓨터의 다운로드 폴더에 파일로 저장할 뿐이에요. 인터넷 어딘가에 올리거나 다른 사람에게 보내지 않아요. 마지막에 받는 정리 파일도 내 폴더에 남아요.</p></div>
+    <div class="pv ai"><span class="tag">내가 쓰는 AI</span><b>돌아보기는 내 AI 대화창에서</b><p>지시문과 기록 파일은 내가 평소 쓰는 AI(스노우챗, ChatGPT, Claude, 제미나이)의 내 대화창에만 올라가요. 원래 그 AI와 나눴던 대화를 내 대화창에서 다시 보는 것과 같아요. 스노우챗은 학교가 제공하는 서비스예요.</p></div>
+  </div>
+  <p class="note" style="margin-top:14px">그래도 보여 주기 싫은 부분은 빼고 올려도 되고, 다른 사람의 이름이나 개인정보는 지우고 올려 주세요.</p>
+</div>
+</section>
+
+<section class="band" style="background:var(--panel)">
+<div class="wrap">
+  <h2>먼저 받아 둘 것 두 가지</h2>
+  <div class="grid2">
+    <div class="card" style="background:var(--bg)">
+      <h3>「AI 대화 돌아보기」 지시문 파일</h3>
+      <p>AI에게 "이렇게 진행해 줘"라고 알려 주는 안내서예요. 대화 기록과 함께 AI에 올립니다. 열어서 고칠 필요는 없어요.</p>
+      <div class="row">
+        <button class="btn" id="dlInstr" type="button">지시문 파일 받기 (.md)</button>
+        <button class="btn ghost" id="cpInstr" type="button">지시문 내용 복사</button>
+      </div>
+      <div class="msg" id="instrMsg" aria-live="polite"></div>
+      <p class="note">파일 이름: MIS_Week12_AI대화돌아보기_지시문_학생배포용_v1.0.md</p>
+    </div>
+    <div class="card" style="background:var(--bg)">
+      <h3>「E2K 대화 저장」 크롬 확장 프로그램</h3>
+      <p>AI와 나눈 대화를 내 말과 AI 답이 번호와 함께 담긴 파일로 저장해 줘요. 압축 파일 <b>e2k_capture.zip</b>을 받아 아래 1단계대로 설치하세요.</p>
+      <div class="row">
+        <a class="btn" href="https://eunjungsilvia.github.io/mis2026/downloads/e2k_capture.zip">E2K 대화 저장 프로그램 다운로드</a>
+      </div>
+      <p class="note" style="margin-top:10px">크롬 PC 버전에서만 쓸 수 있어요. 휴대폰은 안 돼요. 저장한 파일은 내 컴퓨터에만 남고, 누구에게도 자동으로 보내지지 않아요.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="band" id="step1">
+<div class="wrap">
+  <div class="stephead"><div class="badge">1</div><h2>대화 저장하기</h2></div>
+  <div class="grid2">
+    <div>
+      <h3>설치 (처음 한 번)</h3>
+      <ol class="steps">
+        <li>위에서 받은 압축 파일 <b>e2k_capture.zip</b>을 풀어요. 미션을 하는 동안 풀린 폴더는 <b>지우거나 옮기지 마세요.</b></li>
+        <li>크롬 주소창에 <code>chrome://extensions</code> 입력</li>
+        <li><span class="call">A</span>오른쪽 위 <b>개발자 모드</b> 켜기</li>
+        <li><span class="call">B</span>왼쪽 위 <b>압축해제된 확장 프로그램 로드</b>를 누르고, 풀어 둔 폴더 선택 (안에 <code>manifest.json</code>이 보이는 폴더)</li>
+        <li><span class="call">C</span>목록에 <b>E2K 대화 저장 (프로토타입)</b> 카드가 생기고 오른쪽 아래 스위치가 켜져 있으면 끝.</li>
+      </ol>
+      <h3>저장하기</h3>
+      <ol class="steps">
+        <li>크롬에서 돌아볼 대화창을 열어요. 스노우챗, ChatGPT, Claude, 제미나이 대화 모두 저장할 수 있어요.</li>
+        <li><span class="call">D</span>대화창 <b>오른쪽 아래</b>에 <b>「E2K 대화 저장」</b> 버튼이 자동으로 나와요. 그 버튼을 누르면 저장돼요.</li>
+        <li>다운로드 폴더에 <b>E2K_대화제목_날짜시각.md</b> 파일이 생겨요. 대화창이 여러 개면 창마다 한 번씩.</li>
+        <li>저장한 파일을 한 번 열어서 <b>"## [번호] AI"</b> 칸(AI 답)이 들어 있는지 확인해요. AI 답이 빠져 있으면 대화창에서 내 말과 AI 답을 모두 복사해 메모장에 저장한 파일을 대신 써요.</li>
+      </ol>
+    </div>
+    <div><figure class="win" style="margin:0" aria-label="크롬 확장 프로그램 화면 예시">
+      <div class="bar"><i></i><i></i><i></i><span class="addr">chrome://extensions</span></div>
+      <div class="body">
+        <div class="exthead"><h4>확장 프로그램</h4><span class="tog"><span class="call">A</span>개발자 모드 <s></s></span></div>
+        <div class="btnrow"><span class="call">B</span><span class="load">압축해제된 확장 프로그램 로드</span><span class="pill">확장 프로그램 압축</span><span class="pill">업데이트</span></div>
+        <div class="extcard">
+          <div class="top"><span class="ico">E</span><div><b>E2K 대화 저장 (프로토타입)</b><span class="ver">0.8.0</span><small>ChatGPT·Claude·Gemini·SNOWCHAT 대화를 처음부터 끝까지 원문 그대로 모아 내 컴퓨터에 텍스트 파일로 저장합니다. 외부로 아무것도 보내지 않습니다.</small></div></div>
+          <div class="foot"><span class="pill">세부정보</span><span class="pill">삭제</span><span class="call" style="margin-left:auto">C</span><span class="mini" style="margin-left:0"></span></div>
+        </div>
+        <p class="note" style="margin:14px 0 0">그림은 이해를 돕기 위한 예시예요. 실제 화면과 조금 다를 수 있어요.</p>
+      </div>
+    </figure>
+      <figure class="win" style="margin:14px 0 0" aria-label="AI 대화창의 저장 버튼 위치 예시">
+        <div class="bar"><i></i><i></i><i></i><span class="addr">스노우챗 · ChatGPT · Claude · 제미나이 대화창</span></div>
+        <div class="savechat">
+          <div class="ln" style="width:70%"></div><div class="ln" style="width:85%"></div><div class="ln" style="width:55%"></div>
+          <span class="call">D</span><span class="e2kbtn">E2K 대화 저장</span>
+          <div class="inp">답글</div>
+        </div>
+      </figure>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="band" id="step2" style="background:var(--panel)">
+<div class="wrap">
+  <div class="stephead"><div class="badge">2</div><h2>내가 쓰는 AI에 파일 두 개 올리기</h2></div>
+  <div class="grid2">
+    <div>
+      <ol class="steps">
+        <li>내가 쓰는 AI(스노우챗, ChatGPT, Claude, 제미나이)에서 <b>새 대화</b>를 열어요. (미션 때 쓰던 대화창에 이어서 하지 않아요)</li>
+        <li><b>지시문 파일</b>과 1단계에서 저장한 <b>대화 기록 파일(1~2개)</b>을 함께 첨부해요.</li>
+        <li>아래 문장을 복사해 붙여 넣고, 괄호 안만 내 말로 바꿔서 보내요.</li>
+      </ol>
+      <pre id="startText">첨부한 "AI대화돌아보기_지시문" 파일이 지시문이고, 나머지 파일은 내 AI 대화 기록이야.
+지시문대로 진행해 줘.
+이 대화로 하던 일: (한 줄로, 예: 미션 2 업무 흐름 정리 / 마케팅원론 조별 보고서 초안)</pre>
+      <button class="btn ghost" id="cpStart" type="button">이 문장 복사</button>
+      <div class="msg" id="startMsg" aria-live="polite"></div>
+      <div class="warn"><b>가능하면 스노우챗을 이용해 주세요.</b> 스노우챗, ChatGPT, Claude, 제미나이 모두 쓸 수 있어요. 다만 제미나이에서는 대화 기록을 읽을 때 일부 오류(장면 원문이 기록과 다르게 옮겨지거나 응답이 끊기는 일)가 발견됐어요. 다른 AI에서 장면 원문이 내 기록과 다르게 보이면 스노우챗으로 다시 해 주세요.</div>
+    </div>
+    <figure class="win" style="margin:0" aria-label="AI 새 대화에 파일 두 개를 올린 화면 예시">
+      <div class="bar"><i></i><i></i><i></i><span class="addr">스노우챗 · ChatGPT · Claude · 제미나이 · 새 대화</span></div>
+      <div class="body chat">
+        <div class="files">
+          <span class="file"><em>지시문</em>MIS_Week12_AI대화돌아보기_지시문_학생배포용_v1.0.md</span>
+          <span class="file rec"><em>기록</em>E2K_UX리서처 업무 흐름_1118.md</span>
+        </div>
+        <div class="b me">첨부한 "AI대화돌아보기_지시문" 파일이 지시문이고, 나머지 파일은 내 AI 대화 기록이야. 지시문대로 진행해 줘.<br>이 대화로 하던 일: 미션 2 업무 흐름 정리</div>
+        <div class="b ai"><span class="pos">[1단계 · 기록 받기]</span>기록에서 장면 몇 개를 찾아 보여 드리면 → 그중 두 개를 고르시고 → … 10~15분 걸려요.</div>
+      </div>
+    </figure>
+  </div>
+</div>
+</section>
+
+<section class="band" id="step3">
+<div class="wrap">
+  <div class="stephead"><div class="badge">3</div><h2>AI와 장면 돌아보기</h2></div>
+  <p class="lead">AI는 기록에서 장면을 찾아 보여 주는 <b>거울</b>이에요. 잘했다·못했다고 평가하지 않아요. 어느 장면이 중요한지, 무슨 뜻인지는 내가 정해요.</p>
+  <span class="ex">예시 대화 · 가상의 학생</span>
+  <div class="grid2">
+    <div class="chat">
+      <div class="b ai"><span class="pos">[1단계 · 기록 받기]</span>· UX리서처 업무 흐름: 메시지 24개 / 마지막 [24] AI — "정리한 표를 다시 보여 드릴게요."<br>올린 기록의 마지막 메시지와 같으면 '같아요'라고 답해 주세요.</div>
+      <div class="b me">같아요. 나는 AI 답을 거의 그대로 쓴 것 같아.</div>
+      <div class="b ai"><span class="pos">[2단계 · 장면 고르기]</span>
+        ① AI가 업무를 5단계로 나누자, 인터뷰 단계가 빠졌다고 하셨어요. [4] "사용자 인터뷰가 없는데?"<br>
+        ② AI가 단계별 AI 역할 표를 제안하자 그렇게 하자고 하셨어요. [8] "좋아, 그 표로 정리해 줘"<br>
+        ③ 분석 단계를 AI에게 다 맡겨도 되냐고 되물으셨어요. [13] "이건 사람이 봐야 하지 않아?"<br>
+        ④ AI가 고친 표를 받고 다음 단계로 넘어가셨어요. [19] "다음"<br>
+        이 가운데 <b>내가 판단했다고 느끼는 순간 하나</b>와 <b>AI의 답을 그대로 받아들였다고 느끼는 순간 하나</b>를 골라 주세요.</div>
+      <div class="b me"><span class="pick">③</span>이랑 <span class="pick">②</span></div>
+    </div>
+    <div class="chat">
+      <div class="b ai"><span class="pos">[3단계 · 장면 1/2]</span>AI가 분석 단계도 AI가 맡을 수 있다고 하자, [13] "이건 사람이 봐야 하지 않아?"라고 하셨어요. 그 뒤 AI가 표를 고쳤어요.<br>그때 무엇을 보고 그렇게 판단했어요?</div>
+      <div class="b me">인터뷰에서 나온 말을 해석하는 건 맥락을 아는 사람이 해야 한다고 생각했어.</div>
+      <div class="b ai"><span class="pos">[3단계 · 장면 2/2]</span>"맥락을 아는 사람이 해석해야 한다고 생각했다"고 하셨어요. (다르게 말하고 싶으면 알려 주세요.)<br>이번엔 ②예요. … 지금 보니 그대로 받아들여도 괜찮았던 것 같아요, 아니면 확인해 볼 게 있었던 것 같아요?</div>
+      <div class="b me">표가 한눈에 보여서 그냥 좋다고 했는데, 지금 보니 내용은 확인해 볼 게 있었던 것 같아.</div>
+      <div class="b ai"><span class="pos">[4단계 · 나의 방식]</span>처음에 '거의 그대로 쓴 것 같다'고 쓰셨어요. 두 장면을 놓고 보면, 나는 AI의 답을 어떻게 다루는 사람인 것 같아요?</div>
+    </div>
+  </div>
+  <h3>진행하면서 알아 둘 것</h3>
+  <div class="grid2">
+    <ul class="steps" style="padding-left:20px;margin:0">
+      <li><b>AI의 답을 그대로 받아들인 것은 잘못이 아니에요.</b> 무엇을 받아들이고 무엇을 직접 정했는지 아는 것, 그게 12주차에 배운 감독이에요.</li>
+      <li>"잘 모르겠어요", "기억이 안 나요"도 괜찮은 답이에요.</li>
+      <li>후보에 원하는 장면이 없으면 직접 말해도 돼요.</li>
+    </ul>
+    <ul class="steps" style="padding-left:20px;margin:0">
+      <li>AI가 단계를 건너뛰면 <b>"지시문의 ○단계대로 다시 해 줘"</b>라고 말해요.</li>
+      <li>정리에 내가 하지 않은 말이 들어가면 바로잡아 달라고 해요.</li>
+      <li>응답이 중간에 끊기면 "이어서 해 줘"라고 입력해요.</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section class="band" id="step4" style="background:var(--panel)">
+<div class="wrap">
+  <div class="stephead"><div class="badge g">4</div><h2>정리 파일 받기</h2></div>
+  <div class="grid2">
+    <div>
+      <p>마지막에 AI가 다섯 칸 정리를 보여 줘요. 고칠 곳이 없으면 "좋아요"라고 하면 <b>.md 파일</b>로 받을 수 있어요. 파일을 못 만드는 AI라면 정리를 통째로 복사해 보관하세요.</p>
+      <table>
+        <thead><tr><th>칸</th><th>들어가는 것</th></tr></thead>
+        <tbody>
+          <tr><td>1. 돌아본 대화</td><td>무엇을 하던 대화, 어떤 AI와</td></tr>
+          <tr><td>2. 내가 판단한 순간</td><td>장면과 지금 돌아본 내 말</td></tr>
+          <tr><td>3. 그대로 받아들인 순간</td><td>장면과 지금 돌아본 내 말</td></tr>
+          <tr><td>4. 나의 방식</td><td>나는 AI의 답을 어떻게 다루는 사람인가, 한 문장</td></tr>
+          <tr><td>5. 다음에 바꿀 것 하나</td><td>무엇을 할 때, 무엇을 한다</td></tr>
+        </tbody>
+      </table>
+      <div class="warn"><b>11/30(월) 수업 첫머리</b>에 12주차 러닝 저널을 쓸 때 이 정리 파일을 펼쳐 놓고 써요. 제출 방식은 따로 안내해요.</div>
+    </div>
+    <div class="sum" aria-label="정리 파일 예시">
+      <span class="ex">예시 · 가상의 학생</span>
+      <h4>1. 돌아본 대화</h4><p>미션 2 UX리서처 업무 흐름 정리 · 스노우챗 · 메시지 24개</p>
+      <h4>2. 내가 판단한 순간</h4><p>[13] "이건 사람이 봐야 하지 않아?" — 인터뷰에서 나온 말을 해석하는 건 맥락을 아는 사람이 해야 한다고 생각했다.</p>
+      <h4>3. 그대로 받아들인 순간</h4><p>[8] "좋아, 그 표로 정리해 줘" — 표가 한눈에 보여서 좋다고 했는데, 지금 보니 내용은 확인해 볼 게 있었다.</p>
+      <h4>4. 나의 방식</h4><p>내가 잘 아는 부분은 따지고, 보기 좋은 결과는 그냥 받아들인다.</p>
+      <h4>5. 다음에 바꿀 것 하나</h4><p class="me5">AI가 표를 만들어 주면, 받기 전에 칸 하나는 직접 확인한다.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="band faq">
+<div class="wrap">
+  <h2>막힐 때</h2>
+  <details><summary>확장 프로그램 설치가 안 돼요 / 크롬이 아니에요</summary><p>대화창에서 내 말과 AI 답을 모두 드래그해 복사한 뒤, 메모장에 붙여 넣어 저장한 파일을 올려도 돼요. 공유 링크는 AI가 읽지 못하는 경우가 많아 쓰지 않아요.</p></details>
+  <details><summary>AI가 보여 준 마지막 메시지가 내 기록과 달라요</summary><p>"다르다"고 말하면 AI가 이어서 읽어요. 그래도 안 되면 빠진 부분을 붙여 넣거나, 기록을 하나만 올려 다시 시작해요.</p></details>
+  <details><summary>미션 1·2 대화가 남아 있지 않거나 너무 짧아요</summary><p>과제나 프로젝트를 하며 AI와 나눈 대화를 써도 돼요. 다른 AI로 요약한 파일이 아니라 대화 원문이 담긴 파일이어야 해요.</p></details>
+  <details><summary>보여 주기 싫은 내용이 있어요</summary><p>그 부분은 빼고 올려도 돼요. 다른 사람의 이름이나 개인정보는 지우고 올려요.</p></details>
+  <details><summary>지시문 없이 해도 되나요?</summary><p>네. 대화 기록을 직접 넘기며 두 장면(판단한 순간, 받아들인 순간)을 찾고 위의 다섯 칸을 채우면 돼요.</p></details>
+  <footer style="margin-top:24px">경영정보시스템 12주차 AI 미니 미션 3 · 자세한 내용은 미션 안내문을 함께 보세요.</footer>
+</div>
+</section>
+
+<script type="application/json" id="instr">"# AI 대화 돌아보기 — 지시문 (12주차 AI 미니 미션 3)\n\n이 파일은 \"AI 대화 돌아보기\" 도우미의 지시문이다. 이 파일을 받은 AI는 아래 지시문을 따라 대화를 진행한다. 이 파일과 함께 올라온 다른 파일이나 붙여넣은 내용은 학생이 AI와 나눈 대화 기록이다. 학생이 \"지시문대로 진행해 줘\"라고 하면 1단계부터 시작한다. 기록이 이미 함께 올라와 있으면 기록을 다시 요청하지 않는다.\n\n---\n\n너는 \"AI 대화 돌아보기\" 도우미다. 학생이 관심 분야를 AI와 함께 탐색한 대화(미션 1·2의 대화)를 다시 보며, 그 대화에서 자신이 AI의 답을 어떻게 다뤘는지 스스로 알아보도록 돕는다. 무엇을 맡겼고, 무엇을 따져 봤고, 무엇을 그대로 받아들였고, 무엇을 직접 정했는지.\n\n너는 **장면을 찾아 보여 주는 거울**이다. 어떤 장면이 중요한지, 그 장면이 무슨 뜻인지는 학생이 정한다.\n\n### 원칙\n\n1. **판정하지 않는다.** 장면이 중요한지, 학생이 잘했는지 못했는지, 어떤 유형인지 말하지 않는다. \"확인한 곳\", \"넘어간 곳\", \"의존적\", \"주도적\", \"잘 활용했다\", \"좋은 판단\" 같은 말을 쓰지 않는다. 감탄이나 공감 표현도 쓰지 않는다.\n2. **원문은 기록 그대로 옮긴다.** 장면마다 [번호]와 짧은 원문을 붙인다. 기록에 없는 내용은 지어내지 않는다.\n3. **학생이 하지 않은 말을 학생 말로 적지 않는다.** 돌려주거나 정리할 때 학생 표현을 살리고, 해석이나 행동을 덧붙이지 않는다.\n4. **한 응답에 질문은 하나만 한다.** 예외는 지시문에 \"한 번의 요청으로 본다\"고 적은 곳뿐이다.\n5. **\"잘 모르겠어요\", \"기억이 안 나요\"는 정상적인 답이다.** 한 번만 쉽게 바꿔 묻고, 그래도 같으면 \"아직 생각해 보지 않음\"으로 두고 다음으로 간다.\n\n응답 맨 앞에 위치를 붙인다: \"[1단계 · 기록 받기]\", \"[2단계 · 장면 고르기]\", \"[3단계 · 장면 1/2]\", \"[3단계 · 장면 2/2]\", \"[4단계 · 나의 방식]\", \"[5단계 · 정리]\"\n\n### 1단계 · 기록 받기\n\n짧게 인사하고 흐름을 한 줄로 알린다: \"기록에서 장면 몇 개를 찾아 보여 드리면 → 그중 두 개를 고르시고 → 그 장면을 함께 다시 본 뒤 → 내 말로 정리해 파일로 남겨요. 10~15분 걸려요.\"\n\n기록이 없으면 요청한다: \"미션 1·2에서 AI와 나눈 대화 기록 1~2개를 올려 주세요. 대화 저장 파일이 가장 확실하고, 없으면 대화 전체(내 말과 AI 답 모두)를 복사해 붙여넣어 주세요. 보여 주고 싶지 않은 부분이나 다른 사람의 개인정보는 빼고 올려 주세요.\"\n\n기록을 받으면 **모든 기록을 끝까지 읽고**, 기록마다 한 줄로 보여 준다.\n```\n· (기록 이름): 메시지 ○개 / 마지막 [○] (나 또는 AI) — \"(마지막 메시지 첫 문장 그대로)\"\n```\n- 끝까지 읽지 못했으면 그 줄 끝에 \"(일부만 읽었어요: [1]~[○]까지)\"라고 밝힌다.\n- 대화 저장 파일의 \"## [번호] 나 / AI\"를 번호로 쓴다. 붙여넣은 기록은 메시지 순서대로 번호를 붙인다.\n- 링크는 읽지 못하는 경우가 많다. 읽지 못했으면 바로 그렇다고 말하고 파일이나 붙여넣기를 안내한다.\n- 기록에 AI 답이 보이지 않으면 같은 응답에서 알리고, AI 답이 들어간 기록을 함께 올려 달라고 한다.\n\n그리고 한 번에 요청한다(한 번의 요청으로 본다):\n\"올린 기록의 마지막 메시지와 같으면 '같아요'라고 답해 주세요. 그리고 원하면 한 줄 더 적어 주세요: 기록을 보기 전에, 나는 AI의 답을 대체로 어떻게 다뤘다고 기억하나요? 건너뛰어도 괜찮아요.\"\n\n학생이 \"같다\"고 하기 전에는 2단계로 가지 않는다. 다르다고 하면 이어 읽거나 빠진 부분을 붙여넣어 달라고 한다. 학생이 쓴 \"기억 한 줄\"은 그대로 기억해 두고 4단계에서 다시 보여 준다.\n\n### 2단계 · 장면 고르기\n\n기록 전체에서 **학생이 AI의 답을 두고 무언가를 한 순간** 5~6개를 찾는다. 예: AI 답을 따지거나 되물은 곳, 다시 해 달라고 한 곳, 방향을 바꾸거나 거절한 곳, 직접 정한 곳, \"좋아\", \"다음\"으로 받아들이고 넘어간 곳, AI에게 확인을 부탁한 곳.\n\n- 기록의 앞·중간·뒤에서 고루 찾고, 시간 순서대로 번호(①②…)를 붙인다.\n- 학생이 AI 답에 손을 댄 순간과 그대로 받아들인 순간이 모두 들어가게 고른다. 하지만 어느 쪽인지 표시하지 않는다.\n- 장면마다 한 줄로 쓴다: 그때 다루던 내용(개념·제목·선택지의 이름을 그대로), AI가 한 것, 학생이 한 것, [번호], 짧은 원문.\n  - 예: \"③ AI가 장마다 '작은 실행'을 넣자고 하자, 워크북처럼 되는 것 아니냐고 하셨어요. [21] \"약간 워크북처럼 되는 거 아니야?\"\"\n- 판정하는 말(\"중요한\", \"확인 없이\", \"주도적으로\")을 붙이지 않는다.\n\n그리고 묻는다(한 번의 요청으로 본다):\n\"이 가운데 **내가 판단했다고 느끼는 순간 하나**와 **AI의 답을 그대로 받아들였다고 느끼는 순간 하나**를 골라 주세요. 후보에 없으면 직접 말씀해 주셔도 돼요.\"\n\n- 학생이 직접 말한 순간은 기록에서 찾아 [번호]를 붙인다. 찾지 못하면 학생 설명 그대로 두고 \"(기록에서 찾지 못함)\"이라고 적는다.\n- 하나만 고르면 다른 하나를 한 번만 다시 부탁한다. 그래도 없으면 고른 장면 하나로 진행한다.\n- \"모르겠어요\"라고 하면 \"그럼 가장 눈에 띄는 장면 하나만 골라 주세요.\"라고 한 번 묻는다.\n\n### 3단계 · 고른 장면 다시 보기\n\n고른 장면을 하나씩 본다. 판단한 순간을 먼저(장면 1/2), 받아들인 순간을 다음에(장면 2/2) 본다.\n\n장면마다 먼저 보여 준다:\n- 직전 흐름 한 줄: 바로 앞 AI 답의 요지(다루던 내용의 이름을 넣어서)\n- 학생 원문 [번호]\n- 직후 흐름 한 줄: 그다음에 무슨 일이 있었는지\n\n그리고 하나만 묻는다.\n- 판단한 순간: \"그때 무엇을 보고 그렇게 판단했어요?\"\n- 받아들인 순간: \"지금 보니 그대로 받아들여도 괜찮았던 것 같아요, 아니면 확인해 볼 게 있었던 것 같아요?\"\n\n학생이 \"기억이 안 나요\"라고 하면 한 번만 \"지금 이 장면만 보면 어떻게 보여요?\"로 바꿔 묻는다.\n\n학생이 답하면 학생 말을 살려 **한 문장으로 돌려준다.** 해석, 평가, 행동을 덧붙이지 않는다. 답이 길면 그 안에서 학생이 한 행동(무엇을 봤는지, 무엇을 바꿨는지)을 놓치지 않는다. 돌려준 뒤 \"(다르게 말하고 싶으면 알려 주세요.)\"를 붙이고, 같은 응답에서 다음 장면이나 4단계로 넘어간다.\n\n### 4단계 · 나의 방식\n\n1단계에서 학생이 \"기억 한 줄\"을 썼으면 먼저 그대로 보여 준다: \"처음에 '…'라고 쓰셨어요.\" 비교하거나 맞다·틀리다고 말하지 않는다.\n\n그리고 묻는다: \"고른 두 장면을 놓고 보면, 나는 AI의 답을 어떻게 다루는 사람인 것 같아요? 한 문장으로 말해 주세요.\"\n\n학생 답을 한 문장으로 돌려준 뒤, 같은 응답에서 묻는다: \"다음에 AI와 비슷한 일을 할 때 하나만 바꾼다면 무엇을 바꾸시겠어요?\"\n\n- 답을 \"무엇을 할 때, 무엇을 한다\"로 돌려준다. 학생이 말한 행동만 쓴다.\n- 답이 바람이나 불만이면(\"AI가 ~했으면 좋겠다\") 행동을 지어내지 말고 한 번만 묻는다: \"그렇게 되려면 나는 언제, 무엇을 하면 될까요?\" 그래도 행동이 나오지 않으면 학생 말 그대로 적는다.\n- 답이 막연하면(\"더 꼼꼼히\") 한 번만 묻는다: \"어느 장면에서, 무엇을 하면 될까요?\"\n- 돌려준 뒤 같은 응답에서 5단계 정리를 보여 준다.\n\n### 5단계 · 정리\n\n학생이 이 대화에서 한 말을 처음부터 다시 훑고, 아래 틀에 학생 표현 그대로 넣는다. 원문 인용은 기록 그대로 둔다. 학생이 하지 않은 말을 넣지 않는다. 기억 한 줄을 쓰지 않았으면 그 줄은 뺀다.\n\n```\n[5단계 · 정리]\n\n# 나의 AI 대화 돌아보기\n\n## 1. 돌아본 대화\n- 무엇을 하던 대화: (한 줄)\n- 쓴 AI와 기록: (AI 이름, 기록 이름, 메시지 수)\n- 기록을 보기 전 내 기억: (학생이 쓴 한 줄)\n\n## 2. 내가 판단한 순간\n- 장면: (한 줄) [번호] \"(원문)\"\n- 지금 돌아본 내 말: (학생 말)\n\n## 3. 그대로 받아들인 순간\n- 장면: (한 줄) [번호] \"(원문)\"\n- 지금 돌아본 내 말: (학생 말)\n\n## 4. 나의 방식\n- (학생이 말한 한 문장)\n\n## 5. 다음에 바꿀 것 하나\n- (학생 말을 살린 한 문장)\n```\n\n보여 준 뒤 묻는다: \"바꾸고 싶은 표현이 있으면 말해 주세요. 없으면 '좋아요'라고 해 주세요.\" 고치면 전체를 다시 보여 주고 같은 말로 묻는다.\n\n학생이 확인하면 형식을 묻지 않고 바로 .md 파일로 만든다. 파일 이름은 \"AI대화돌아보기_\u003c무엇을 하던 대화>_\u003c날짜>.md\", 맨 위에 날짜와 \"AI 대화 돌아보기 v1.0\"을 적는다. 파일을 만들 수 없으면 하나의 코드 블록으로 준다.\n\n마무리로 말한다: \"정리가 끝났어요. 이 파일을 보관해 두었다가 러닝 저널을 쓸 때 펼쳐 보세요. 이번 돌아보기는 여기서 끝났어요.\"\n\n### 말투\n\n한국어 존댓말로, 짧고 쉽게 말한다. 칭찬하거나 평가하지 않는다.\n\n### 매 응답 전 점검\n\n1. 맨 앞에 위치 표시를 붙였나\n2. 질문이 하나뿐인가 (지시문에 적은 예외 제외)\n3. 판정하는 말(중요도, 잘함·못함, 유형)이 없나\n4. 원문을 기록 그대로 옮겼고, 학생이 하지 않은 말을 학생 말로 쓰지 않았나\n5. 장면을 보여 줄 때 다루던 내용의 이름을 넣었나\n"</script>
+<script>
+{
+  const instr = JSON.parse(document.getElementById('instr').textContent);
+  const fname = 'MIS_Week12_AI대화돌아보기_지시문_학생배포용_v1.0.md';
+  const show = (id, t) => { const m = document.getElementById(id); m.textContent = t; };
+  let dlP = Promise.resolve(null);
+  try { if (window.claude && window.claude.use) dlP = window.claude.use('downloads').catch(() => null); } catch (e) {}
+  const blobSave = () => {
+    const b = new Blob([instr], {type: 'text/markdown;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b); a.download = fname;
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+  const copy = async (text, id) => {
+    try { await navigator.clipboard.writeText(text); show(id, '복사했어요. 붙여 넣으면 돼요.'); }
+    catch (e) { show(id, '복사가 막혀 있어요. 글을 길게 눌러 직접 복사해 주세요.'); }
+  };
+  document.getElementById('dlInstr').addEventListener('click', async () => {
+    let dl = null;
+    if (window.claude && window.claude.use) { dl = await dlP; }
+    if (dl) {
+      try { await dl.save({filename: fname, data: instr}); show('instrMsg', '저장했어요. 다운로드 폴더를 확인하세요.'); }
+      catch (e) { show('instrMsg', '저장되지 않았어요. "지시문 내용 복사"로 받아 메모장에 붙여 넣고 같은 이름으로 저장해도 돼요.'); }
+    } else {
+      try { blobSave(); show('instrMsg', '저장했어요. 다운로드 폴더를 확인하세요.'); }
+      catch (e) { show('instrMsg', '저장되지 않았어요. "지시문 내용 복사"를 써 주세요.'); }
+    }
+  });
+  document.getElementById('cpInstr').addEventListener('click', () => copy(instr, 'instrMsg'));
+  document.getElementById('cpStart').addEventListener('click', () => copy(document.getElementById('startText').textContent, 'startMsg'));
+}
+</script>
+</body>
+</html>
