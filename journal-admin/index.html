@@ -83,7 +83,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const norm=s=>String(s??'').trim().toLowerCase();
 const fmt=t=>t?new Date(t).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
 const filled=r=>r&&Object.values(r.responses||{}).some(v=>String(v||'').trim());
-const fieldsOf=w=>(WEEKS.find(x=>x.week===w)?.sections||[]).flatMap(s=>s.fields);
+const fieldsOf=w=>(WEEKS.find(x=>x.week===w)?.sections||[]).flatMap(s=>s.fields||[]);
 
 $('weekSeg').innerHTML=WEEKS.map(w=>'<button data-w="'+w.week+'"'+(w.week===week?' class="on"':'')+'>'+w.week+'주차</button>').join('');
 $('weekSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;week=Number(b.dataset.w);[...$('weekSeg').children].forEach(x=>x.classList.toggle('on',x===b));render()};
@@ -158,7 +158,9 @@ function sheetView(s,w,j){
   const pv=(v,tall)=>'<div class="pval'+(tall?' tall':'')+'">'+(String(v||'').trim()?esc(v):'<span class="no">–</span>')+'</div>';
   const secs=w.sections.map(sec=>{
     let h=sec.title?'<h4 class="sh">'+esc(sec.title)+'</h4>':'';
-    if(sec.layout==='grid'){
+    if(sec.layout==='info'){
+      // 단계 설명 같은 참고 표는 조회 화면에 넣지 않는다
+    } else if(sec.layout==='grid'){
       h+='<table class="sheet grid"><thead><tr>'+sec.cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+
         sec.rows.map(row=>'<tr><th class="rl">'+esc(row.label)+'</th>'+row.keys.map(k=>'<td>'+pv(r[k],true)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
     } else if(sec.layout==='block'){
