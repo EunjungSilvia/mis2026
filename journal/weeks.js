@@ -99,7 +99,7 @@ window.JOURNAL_WEEKS = [
     title: '12주차 · AI와 함께 일한 나는 AI를 어떻게 감독했나',
     sheetTitle: '러닝 저널',
     lead: '미션 3에서 받은 「AI 대화 돌아보기」 정리 파일(AI대화돌아보기_….md)을 펼쳐 놓고 작성한다. 지시문 없이 직접 한 경우에는 미션 3 정리표를 펼쳐 놓는다. 칸마다 두세 문장으로, 내 말로 쓴다.',
-    open: true,
+    open: false,
     sections: [
       {
         title: '',
