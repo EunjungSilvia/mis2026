@@ -39,6 +39,8 @@ table.sheet{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom
 .sheet th,.sheet td{border:1px solid #9a9ea6;vertical-align:middle;padding:0}
 .sheet th{background:#efeee9;text-align:left;font-weight:700;font-size:.92rem;padding:9px 10px;line-height:1.45}
 .sheet.kv th{width:33%}.sheet.grid thead th:first-child,.sheet .rl{width:23%}
+.sheet th small{display:block;font-weight:400;color:#5b6168;font-size:.84rem;margin-top:3px}
+.sheet.info th,.sheet.info td{padding:7px 10px;font-size:.9rem;line-height:1.45}.sheet.info td{background:#fff}.sheet.info .ic{width:90px}
 .cellin{display:block;width:100%;border:0;resize:none;overflow:hidden;padding:9px 10px;line-height:1.55;font-size:.95rem;background:transparent;color:#1f2328;min-height:40px}
 .cellin:focus{outline:2px solid #4b8a6c;outline-offset:-2px;background:#fbfdfb}
 @media(max-width:760px){.sheet,.sheet tbody,.sheet tr,.sheet th,.sheet td{display:block;width:100%!important}.sheet thead{display:none}.sheet td{border-top:0}.sheet td[data-l]::before{content:attr(data-l);display:block;font-size:.8rem;color:#6b6f73;padding:6px 10px 0}}
@@ -58,6 +60,8 @@ table.sheet{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom
   .psheet .sheet tr{page-break-inside:avoid;break-inside:avoid}
   .psheet .sheet th,.psheet .sheet td{border:1px solid #9a9ea6;vertical-align:middle;padding:0}
   .psheet .sheet th{background:#efeee9;text-align:left;font-weight:700;padding:7px 8px;line-height:1.4;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .psheet .sheet th small{display:block;font-weight:400;color:#555;margin-top:2px}
+  .psheet .sheet.info th,.psheet .sheet.info td{padding:5px 8px;font-size:9.5pt}.psheet .sheet.info .ic{width:70px}
   .psheet .sheet.kv th{width:33%}.psheet .sheet.grid thead th:first-child,.psheet .sheet .rl{width:23%}
   .pval{white-space:pre-wrap;word-break:break-word;padding:7px 8px;line-height:1.5;min-height:28px}
   .pval.tall{min-height:70px}
@@ -239,17 +243,21 @@ function renderHome(){
   setState('ok','');
 }
 function cell(key,val,tall){return '<textarea class="cellin'+(tall?' tall':'')+'" id="f_'+key+'" data-key="'+key+'" rows="1">'+esc(val)+'</textarea>'}
+function lbl(f){return esc(f.label)+(f.hint?'<small>'+esc(f.hint)+'</small>':'')}
+function infoTable(s){return '<table class="sheet info"><thead><tr>'+s.cols.map((c,i)=>'<th'+(i===0?' class="ic"':'')+'>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+s.rows.map(row=>'<tr>'+row.map((c,i)=>i===0?'<th class="ic">'+esc(c)+'</th>':'<td>'+esc(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table>'}
 function renderWeek(w){
   const cfg=WEEKS.find(x=>x.week===w);const r=journals[w]?.responses||{};
   const secs=cfg.sections.map(s=>{
     let h=(s.title?'<h3 class="sh">'+esc(s.title)+'</h3>':'')+(s.note?'<p class="hint" style="margin:-2px 0 8px;color:#5b6168">'+esc(s.note)+'</p>':'');
-    if(s.layout==='grid'){
+    if(s.layout==='info'){
+      h+=infoTable(s);
+    } else if(s.layout==='grid'){
       h+='<table class="sheet grid"><thead><tr>'+s.cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+
         s.rows.map(row=>'<tr><th class="rl">'+esc(row.label)+'</th>'+row.keys.map((k,i)=>'<td data-l="'+esc(s.cols[i+1]||'')+'">'+cell(k,r[k],true)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
     } else if(s.layout==='block'){
-      h+='<table class="sheet"><tbody>'+s.fields.map(f=>'<tr><th class="hd"><label for="f_'+f.key+'">'+esc(f.label)+'</label></th></tr><tr><td>'+cell(f.key,r[f.key],true)+'</td></tr>').join('')+'</tbody></table>';
+      h+='<table class="sheet"><tbody>'+s.fields.map(f=>'<tr><th class="hd"><label for="f_'+f.key+'">'+lbl(f)+'</label></th></tr><tr><td>'+cell(f.key,r[f.key],true)+'</td></tr>').join('')+'</tbody></table>';
     } else {
-      h+='<table class="sheet kv"><tbody>'+s.fields.map(f=>'<tr><th><label for="f_'+f.key+'">'+esc(f.label)+'</label></th><td>'+cell(f.key,r[f.key],s.tall)+'</td></tr>').join('')+'</tbody></table>';
+      h+='<table class="sheet kv"><tbody>'+s.fields.map(f=>'<tr><th><label for="f_'+f.key+'">'+lbl(f)+'</label></th><td>'+cell(f.key,r[f.key],s.tall)+'</td></tr>').join('')+'</tbody></table>';
     }
     return h;
   }).join('');
@@ -269,13 +277,15 @@ function sheetHTML(w){
   const pv=(v,tall)=>'<div class="pval'+(tall?' tall':'')+'">'+esc(v)+'</div>';
   const secs=cfg.sections.map(s=>{
     let h=(s.title?'<h3 class="sh">'+esc(s.title)+'</h3>':'')+(s.note?'<p class="hint" style="margin:-2px 0 8px;color:#5b6168">'+esc(s.note)+'</p>':'');
-    if(s.layout==='grid'){
+    if(s.layout==='info'){
+      h+=infoTable(s);
+    } else if(s.layout==='grid'){
       h+='<table class="sheet grid"><thead><tr>'+s.cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+
         s.rows.map(row=>'<tr><th class="rl">'+esc(row.label)+'</th>'+row.keys.map(k=>'<td>'+pv(r[k],true)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
     } else if(s.layout==='block'){
-      h+='<table class="sheet"><tbody>'+s.fields.map(f=>'<tr><th>'+esc(f.label)+'</th></tr><tr><td>'+pv(r[f.key],true)+'</td></tr>').join('')+'</tbody></table>';
+      h+='<table class="sheet"><tbody>'+s.fields.map(f=>'<tr><th>'+lbl(f)+'</th></tr><tr><td>'+pv(r[f.key],true)+'</td></tr>').join('')+'</tbody></table>';
     } else {
-      h+='<table class="sheet kv"><tbody>'+s.fields.map(f=>'<tr><th>'+esc(f.label)+'</th><td>'+pv(r[f.key],s.tall)+'</td></tr>').join('')+'</tbody></table>';
+      h+='<table class="sheet kv"><tbody>'+s.fields.map(f=>'<tr><th>'+lbl(f)+'</th><td>'+pv(r[f.key],s.tall)+'</td></tr>').join('')+'</tbody></table>';
     }
     return h;
   }).join('');

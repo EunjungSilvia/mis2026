@@ -96,8 +96,61 @@ window.JOURNAL_WEEKS = [
   },
   {
     week: 12,
-    title: '12주차 · 그 일에서 AI를 쓸 때 누가 무엇을 책임지나',
-    open: false,
-    sections: []
+    title: '12주차 · AI와 함께 일한 나는 AI를 어떻게 감독했나',
+    sheetTitle: '러닝 저널',
+    lead: '미션 3에서 받은 「AI 대화 돌아보기」 정리 파일(AI대화돌아보기_….md)을 펼쳐 놓고 작성한다. 지시문 없이 직접 한 경우에는 미션 3 정리표를 펼쳐 놓는다. 칸마다 두세 문장으로, 내 말로 쓴다.',
+    open: true,
+    sections: [
+      {
+        title: '',
+        layout: 'kv',
+        fields: [
+          { key: 'conversation', label: '돌아본 대화', hint: '무엇을 하던 대화였나' }
+        ]
+      },
+      {
+        title: '1. 미션에서 무엇을 발견했나',
+        layout: 'kv',
+        fields: [
+          { key: 'my_way', label: '나의 방식', hint: "정리 파일 4번 '나의 방식'을 옮겨 적는다" }
+        ]
+      },
+      {
+        title: '',
+        layout: 'kv',
+        tall: true,
+        fields: [
+          { key: 'discovered', label: '대화를 다시 보기 전에 내가 생각하던 나와 비교하면, 새로 알게 되었거나 의외였던 점은 무엇인가' }
+        ]
+      },
+      {
+        title: '2. 나는 AI를 어떻게 감독하고 있었나',
+        layout: 'info',
+        cols: ['단계', '하는 일'],
+        rows: [
+          ['계획', '무엇을 AI에게 맡기고 무엇을 내가 할지 정한다'],
+          ['지시', '원하는 결과와 조건을 AI에게 알려 준다'],
+          ['모니터링', 'AI의 답이 맞게 가고 있는지 살핀다'],
+          ['개입', '이상하면 멈추고, 고치고, 다시 시킨다'],
+          ['학습', 'AI와 일하며 알게 된 것을 다음 일에 반영한다']
+        ]
+      },
+      {
+        title: '',
+        layout: 'kv',
+        tall: true,
+        fields: [
+          { key: 'supervision', label: '나는 다섯 단계 가운데 어디에 가장 힘을 쏟는 편인가? 그 단계에서 내가 하고 있는 나만의 방법과, 실제로 그렇게 한 장면을 적는다', hint: '미션 3에서 돌아본 대화가 아니어도 된다' }
+        ]
+      },
+      {
+        title: '3. 다음에 무엇을 해 볼까',
+        layout: 'kv',
+        tall: true,
+        fields: [
+          { key: 'change', label: '2번에서 찾은 내 감독 방식을 보고, 다음에 AI와 일할 때 내 방식에서 하나 바꿔 본다면 무엇을 바꾸고 싶은가' }
+        ]
+      }
+    ]
   }
 ];
